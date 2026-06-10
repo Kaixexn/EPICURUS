@@ -14,6 +14,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 
+// Get user's liked posts from localStorage
+function getLikedPosts() {
+  var liked = localStorage.getItem('epicurus_liked');
+  return liked ? JSON.parse(liked) : [];
+}
+
+function setLiked(postId) {
+  var liked = getLikedPosts();
+  liked.push(postId);
+  localStorage.setItem('epicurus_liked', JSON.stringify(liked));
+}
+
+function hasLiked(postId) {
+  var liked = getLikedPosts();
+  return liked.includes(postId);
+}
+
 function formatTime(timestamp) {
   if (!timestamp) return 'Just now';
   var now = Date.now();
@@ -43,6 +60,7 @@ function createPostElement(post, postId) {
   article.dataset.id = postId;
 
   var authorDisplay = post.authorName || 'Anonymous';
+  var userHasLiked = hasLiked(postId);
 
   var commentsHtml = '';
   if (post.comments && post.comments.length > 0) {
@@ -72,13 +90,17 @@ function createPostElement(post, postId) {
     '</div>' +
     '<div class="post-content">' + escapeHtml(post.content) + '</div>' +
     '<div class="post-actions">' +
-      '<button class="action-btn like-btn ' + (post.liked ? 'liked' : '') + '" data-id="' + postId + '">' +
+      '<button class="action-btn like-btn ' + (userHasLiked ? 'liked' : '') + '" data-id="' + postId + '" ' + (userHasLiked ? 'disabled' : '') + '>' +
         '<span>♥</span>' +
         '<span class="count">' + (post.likes || 0) + '</span>' +
       '</button>' +
       '<button class="action-btn comment-btn" data-id="' + postId + '">' +
         '<span>💬</span>' +
         '<span class="count">' + (post.comments ? post.comments.length : 0) + '</span>' +
+      '</button>' +
+      '<button class="action-btn delete-btn" data-id="' + postId + '">' +
+        '<span>🗑</span>' +
+        '<span class="count">Delete</span>' +
       '</button>' +
     '</div>' +
     '<div class="comments-section" id="comments-' + postId + '">' +
@@ -132,8 +154,8 @@ function renderPosts(postsData, filter) {
 }
 
 function attachPostEventListeners() {
-  // Like buttons
-  var likeBtns = document.querySelectorAll('.like-btn');
+  // Like buttons - now with spam prevention
+  var likeBtns = document.querySelectorAll('.like-btn:not([disabled])');
   likeBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var postId = this.dataset.id;
@@ -143,7 +165,13 @@ function attachPostEventListeners() {
         var post = snapshot.val();
         if (post) {
           var newLikes = (post.likes || 0) + 1;
-          postRef.update({ likes: newLikes, liked: true });
+          postRef.update({ likes: newLikes });
+          setLiked(postId); // Save that user liked this post
+          // Disable button after liking
+          btn.classList.add('liked');
+          btn.disabled = true;
+          var countSpan = btn.querySelector('.count');
+          countSpan.textContent = newLikes;
         }
       });
     });
@@ -168,13 +196,24 @@ function attachPostEventListeners() {
     });
   });
 
+  // Delete buttons
+  var deleteBtns = document.querySelectorAll('.delete-btn');
+  deleteBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (confirm('Delete this post? This cannot be undone.')) {
+        var postId = this.dataset.id;
+        db.ref('posts/' + postId).remove();
+      }
+    });
+  });
+
   // Comment forms
   var commentForms = document.querySelectorAll('.comment-form');
   commentForms.forEach(function(form) {
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      var postId = this.dataset.postId;
-      var input = this.querySelector('.comment-input');
+      var postId = form.dataset.postId;
+      var input = form.querySelector('.comment-input');
       var content = input.value.trim();
 
       if (!content) return;
@@ -238,7 +277,6 @@ postForm.addEventListener('submit', function(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span>Posting...</span>';
 
-  // Push new post to Firebase
   postsRef.push({
     authorName: authorName || null,
     content: content,
