@@ -503,6 +503,16 @@ nav {
   border: 1px solid rgba(229,115,115,0.3);
 }
 
+.delete-btn {
+  color: #e57373 !important;
+  border-color: rgba(229,115,115,0.3) !important;
+}
+
+.delete-btn:hover {
+  background: #e57373 !important;
+  color: var(--brown-deepest) !important;
+}
+
 @media (max-width: 680px) {
   .nav-links { display: none; }
   .hamburger { display: flex; }
