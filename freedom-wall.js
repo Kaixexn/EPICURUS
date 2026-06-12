@@ -94,9 +94,8 @@ function searchMusic(query) {
 function togglePreview(btn) {
   var previewUrl = btn.dataset.preview;
   
-  if (currentPreviewAudio && currentPreviewAudio !== btn) {
+  if (currentPreviewAudio && currentPreviewBtn !== btn) {
     currentPreviewAudio.pause();
-    currentPreviewAudio = null;
     if (currentPreviewBtn) {
       currentPreviewBtn.textContent = '▶';
       currentPreviewBtn.classList.remove('playing');
@@ -104,18 +103,23 @@ function togglePreview(btn) {
   }
   
   if (btn.classList.contains('playing')) {
+    if (currentPreviewAudio) currentPreviewAudio.pause();
     btn.textContent = '▶';
     btn.classList.remove('playing');
+    currentPreviewAudio = null;
+    currentPreviewBtn = null;
   } else {
     btn.textContent = '⏸';
     btn.classList.add('playing');
     currentPreviewAudio = new Audio(previewUrl);
-    currentPreviewAudio.play();
+    currentPreviewAudio.play().catch(function(err) { console.error("Audio preview blocked:", err); });
     currentPreviewBtn = btn;
     
     currentPreviewAudio.addEventListener('ended', function() {
       btn.textContent = '▶';
       btn.classList.remove('playing');
+      currentPreviewAudio = null;
+      currentPreviewBtn = null;
     });
   }
 }
@@ -280,7 +284,7 @@ function createPostElement(post, postId) {
         'View comments (' + (post.comments ? post.comments.length : 0) + ')' +
       '</button>' +
       '<form class="comment-form" data-post-id="' + postId + '">' +
-        '<input type="text" class="comment-input" placeholder="Write a comment..." required>' +
+        '<input type="text" class="comment-input" placeholder="Write an anonymous comment..." required>' +
         '<button type="submit" class="comment-submit">Post</button>' +
       '</form>' +
       '<div class="comments-list">' + commentsHtml + '</div>' +
@@ -291,6 +295,7 @@ function createPostElement(post, postId) {
 
 function renderPosts(postsData, filter) {
   var container = document.getElementById('postsContainer');
+  if (!container) return;
   container.innerHTML = '';
 
   var posts = [];
@@ -338,7 +343,6 @@ function attachPostEventListeners() {
           reactions[reaction] = (reactions[reaction] || 0) + 1;
           postRef.update({ reactions: reactions });
           saveUserReaction(postId, reaction);
-          renderPostsByFilter();
         }
       });
     });
@@ -348,14 +352,15 @@ function attachPostEventListeners() {
     btn.addEventListener('click', function() {
       var postId = this.dataset.id;
       var section = document.getElementById('comments-' + postId);
-      section.classList.toggle('show');
+      if (section) section.classList.toggle('show');
     });
   });
 
   document.querySelectorAll('.comments-toggle').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var target = this.dataset.target;
-      document.getElementById(target).classList.toggle('show');
+      var section = document.getElementById(target);
+      if (section) section.classList.toggle('show');
     });
   });
 
@@ -381,7 +386,11 @@ function attachPostEventListeners() {
         var post = snapshot.val();
         if (post) {
           var comments = post.comments || [];
-          comments.push({ content: content, author: post.authorName || 'Anonymous', timestamp: Date.now() });
+          comments.push({ 
+            content: content, 
+            author: 'Anonymous', 
+            timestamp: Date.now() 
+          });
           postRef.update({ comments: comments });
         }
       });
@@ -419,62 +428,66 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
 });
 
 var postForm = document.getElementById('postForm');
-postForm.addEventListener('submit', function(e) {
-  e.preventDefault();
+if (postForm) {
+  postForm.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-  var submitBtn = document.getElementById('submitBtn');
-  var authorName = document.getElementById('authorName').value.trim();
-  var content = document.getElementById('postContent').value.trim();
-
-  if (!content) return;
-
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span>Posting...</span>';
-
-  var postData = {
-    authorName: authorName || null,
-    content: content,
-    timestamp: Date.now(),
-    reactions: {},
-    comments: []
-  };
-
-  if (selectedMusic) {
-    postData.musicData = selectedMusic;
-  }
-
-  postsRef.push(postData).then(function() {
+    var submitBtn = document.getElementById('submitBtn');
     var authorNameEl = document.getElementById('authorName');
     var postContentEl = document.getElementById('postContent');
     
-  if (authorNameEl) authorNameEl.value = '';
-    if (postContentEl) postContentEl.value = '';
-    
-    if (currentPreviewAudio) {
-      currentPreviewAudio.pause();
-      currentPreviewAudio = null;
-    }
-    if (currentPreviewBtn) {
-      currentPreviewBtn.textContent = '▶';
-      currentPreviewBtn.classList.remove('playing');
-      currentPreviewBtn = null;
-    }
-    
-    clearSelectedMusic();
-    
+    var authorName = authorNameEl ? authorNameEl.value.trim() : '';
+    var content = postContentEl ? postContentEl.value.trim() : '';
+
+    if (!content) return;
+
     if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span>Post to Wall</span>';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Posting...</span>';
     }
-  }).catch(function(error) {
-    console.error('Error posting:', error);
-    alert('Failed to post. Please try again.');
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span>Post to Wall</span>';
+
+    var postData = {
+      authorName: authorName || null,
+      content: content,
+      timestamp: Date.now(),
+      reactions: { haha: 0, sad: 0, angry: 0 },
+      comments: []
+    };
+
+    if (selectedMusic) {
+      postData.musicData = selectedMusic;
     }
+
+    postsRef.push(postData).then(function() {
+      if (authorNameEl) authorNameEl.value = '';
+      if (postContentEl) postContentEl.value = '';
+      
+      if (currentPreviewAudio) {
+        currentPreviewAudio.pause();
+        currentPreviewAudio = null;
+      }
+      if (currentPreviewBtn) {
+        currentPreviewBtn.textContent = '▶';
+        currentPreviewBtn.classList.remove('playing');
+        currentPreviewBtn = null;
+      }
+      
+      clearSelectedMusic();
+      
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Post to Wall</span>';
+      }
+    }).catch(function(error) {
+      console.error('Error posting:', error);
+      alert('Failed to post. Please try again.');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Post to Wall</span>';
+      }
+    });
   });
-});
+}
 
 var hamburger = document.getElementById('hamburger');
 var mobileMenu = document.getElementById('mobileMenu');
