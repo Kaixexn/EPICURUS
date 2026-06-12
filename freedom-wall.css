@@ -885,6 +885,78 @@ nav {
   border-radius: 4px;
 }
 
+/* ========== ADMIN CONTROLS ========== */
+.admin-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.admin-controls #adminLogoutBtn {
+  display: none;
+}
+
+.admin-controls.logged-in #adminLoginBtn {
+  display: none;
+}
+
+.admin-controls.logged-in #adminLogoutBtn {
+  display: block;
+}
+
+.admin-controls .filter-btn {
+  padding: 0.4rem 0.8rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240,204,114,0.7);
+  background: transparent;
+  border: 1px solid rgba(212,168,67,0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-controls .filter-btn:hover,
+.admin-controls .filter-btn.active {
+  color: var(--brown-deepest);
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 15px rgba(212,168,67,0.3);
+}
+
+/* Admin indicator badge */
+.admin-indicator {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(212,168,67,0.2);
+  border: 1px solid var(--gold-bright);
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  color: var(--gold-bright);
+}
+
+.admin-indicator::before {
+  content: '⚡';
+}
+
+/* Delete button styling */
+.delete-btn {
+  margin-left: auto;
+  color: #e57373 !important;
+  border-color: rgba(229,115,115,0.3) !important;
+}
+
+.delete-btn:hover {
+  background: #e57373 !important;
+  color: var(--brown-deepest) !important;
+  box-shadow: 0 0 15px rgba(229,115,115,0.4);
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 680px) {
   .nav-links { display: none; }
