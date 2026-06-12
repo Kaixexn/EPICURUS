@@ -1,0 +1,609 @@
+/* ============================================================
+   EPICURUS — hall-of-fame.css
+   Styles specific to the Hall of Fame page
+   ============================================================ */
+
+/* ── PAGE HEADER ── */
+.hof-header {
+  background: var(--brown-deep);
+  position: relative;
+  overflow: hidden;
+}
+
+.hof-header-inner {
+  text-align: center;
+  padding: 2.8rem 2rem 2.5rem;
+}
+
+.laurel-crown {
+  margin-bottom: 1rem;
+}
+
+.hof-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-weight: 900;
+  color: var(--gold-bright);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 50px rgba(212,168,67,0.13);
+  margin-bottom: 0.4rem;
+  line-height: 1;
+}
+
+/* Underline ornament */
+.title-underline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0.5rem auto 1.2rem;
+  width: fit-content;
+}
+.tul-line {
+  width: 100px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright));
+}
+.tul-line.right {
+  background: linear-gradient(90deg, var(--gold-bright), transparent);
+}
+.tul-diamond {
+  width: 6px; height: 6px;
+  background: var(--gold-bright);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+.tul-diamond.sm {
+  width: 4px; height: 4px;
+  opacity: 0.5;
+}
+
+.hof-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-weight: 300;
+  color: rgba(250,234,176,0.7);
+  line-height: 1.7;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* ── ADMIN TOOLBAR ── */
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.2rem;
+  background: rgba(212,168,67,0.07);
+  border: 1px solid rgba(212,168,67,0.25);
+  border-left: 3px solid var(--gold-bright);
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
+
+.admin-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+}
+
+.logout-btn {
+  color: rgba(212,168,67,0.45);
+  border-color: rgba(212,168,67,0.2);
+  font-size: 0.62rem;
+}
+.logout-btn:hover {
+  color: #c0392b;
+  border-color: #c0392b;
+  background: rgba(192,57,43,0.08);
+}
+
+/* Admin login trigger (subtle bottom-right) */
+.admin-login-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.admin-trigger-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(154,117,32,0.55);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid rgba(154,117,32,0.2);
+  transition: color var(--transition), border-color var(--transition);
+}
+.admin-trigger-btn:hover {
+  color: var(--gold-dark);
+  border-color: rgba(154,117,32,0.45);
+}
+
+/* ── SECTION BLOCK ── */
+.hof-section {
+  margin-bottom: 3.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+.section-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.section-banner-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-dark), transparent);
+  opacity: 0.45;
+}
+.section-banner-line.right {
+  background: linear-gradient(90deg, transparent, var(--gold-dark));
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.85rem, 2vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  white-space: nowrap;
+}
+
+.section-number {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(212,168,67,0.3);
+  padding: 2px 8px;
+  border: 1px solid rgba(212,168,67,0.18);
+}
+
+.section-admin-btns {
+  display: none;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.admin-mode .section-admin-btns { display: flex; }
+
+.section-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-dark);
+  border: 1px solid rgba(212,168,67,0.28);
+  padding: 0.3rem 0.65rem;
+  transition: border-color var(--transition), color var(--transition);
+}
+.section-btn:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
+.section-btn.danger:hover { color: #c0392b; border-color: #c0392b; }
+
+/* ── OFFICER GRID LAYOUTS ── */
+
+/* Wide layout — 2 large featured cards */
+.officers-wide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Grid layout — up to 3 columns */
+.officers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* Add officer placeholder card */
+.add-officer-card {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  border: 2px dashed rgba(212,168,67,0.22);
+  min-height: 260px;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: rgba(212,168,67,0.4);
+  text-transform: uppercase;
+}
+.admin-mode .add-officer-card { display: flex; }
+.add-officer-card:hover {
+  border-color: rgba(212,168,67,0.55);
+  background: rgba(212,168,67,0.04);
+  color: var(--gold-dark);
+}
+.add-officer-card-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  color: rgba(212,168,67,0.3);
+}
+
+/* ── OFFICER CARD ── */
+.officer-card {
+  background: var(--brown-panel);
+  border: 1px solid rgba(212,168,67,0.16);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.22s, transform 0.22s, box-shadow 0.22s;
+  position: relative;
+  animation: fadeInUp 0.35s ease both;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Top gold accent */
+.officer-card::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-dark) 40%, transparent);
+  opacity: 0.6;
+}
+
+.officer-card:hover {
+  border-color: rgba(212,168,67,0.42);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+}
+
+/* Photo */
+.officer-photo-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--brown-rich);
+}
+
+.officers-wide .officer-photo-wrap { aspect-ratio: 3/4; }
+.officers-grid .officer-photo-wrap { aspect-ratio: 3/4; }
+
+.officer-photo-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.officer-card:hover .officer-photo-wrap img {
+  transform: scale(1.04);
+}
+
+/* No photo placeholder */
+.photo-empty {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(212,168,67,0.2);
+  font-size: 3rem;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(212,168,67,0.02) 10px,
+    rgba(212,168,67,0.02) 20px
+  );
+}
+
+/* Photo overlay shimmer on hover */
+.officer-photo-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(26,14,6,0.65) 100%);
+  pointer-events: none;
+}
+
+/* Card body */
+.officer-card-body {
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.officer-card-position {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 0.25rem;
+}
+
+.officer-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--gold-light);
+  margin-bottom: 0.5rem;
+}
+
+.officer-card-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: rgba(253,246,227,0.6);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Admin controls on card */
+.card-admin-controls {
+  display: none;
+  position: absolute;
+  top: 8px; right: 8px;
+  gap: 5px;
+  z-index: 10;
+}
+.admin-mode .card-admin-controls { display: flex; }
+
+.card-ctrl-btn {
+  width: 26px; height: 26px;
+  background: rgba(26,14,6,0.88);
+  border: 1px solid rgba(212,168,67,0.3);
+  color: var(--gold-dark);
+  font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--transition), border-color var(--transition);
+}
+.card-ctrl-btn:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
+.card-ctrl-btn.del:hover { color: #c0392b; border-color: #c0392b; }
+
+/* ── OFFICER DETAIL MODAL ── */
+.officer-modal-box {
+  display: flex;
+  gap: 2rem;
+  max-width: 640px;
+  align-items: flex-start;
+}
+
+.om-photo-wrap {
+  width: 160px;
+  flex-shrink: 0;
+  border: 1px solid rgba(212,168,67,0.3);
+  border-top: 2px solid var(--gold-bright);
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  background: var(--brown-rich);
+}
+
+.om-photo-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.om-body { flex: 1; min-width: 0; }
+
+.om-position {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 0.3rem;
+}
+
+.om-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.om-divider {
+  width: 60px; height: 1px;
+  background: rgba(212,168,67,0.35);
+  margin-bottom: 0.9rem;
+}
+
+.om-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: rgba(250,234,176,0.75);
+  border-left: 2px solid rgba(212,168,67,0.3);
+  padding-left: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.om-legacy-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 0.4rem;
+}
+
+.om-legacy {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: rgba(253,246,227,0.65);
+}
+
+/* ── ADMIN MODALS ── */
+.admin-modal-box { max-width: 400px; text-align: center; }
+
+.admin-modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.admin-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 0.1em;
+}
+
+.admin-modal-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: rgba(212,168,67,0.5);
+  font-size: 0.9rem;
+}
+
+.admin-error {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  color: #e74c3c;
+  font-style: italic;
+  margin-top: 0.4rem;
+}
+
+/* Edit officer modal */
+.edit-officer-modal-box { max-width: 480px; }
+
+.modal-form-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  margin-bottom: 1.4rem;
+  text-align: center;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 0.8rem;
+}
+
+/* Photo upload area */
+.photo-upload-area {
+  margin-bottom: 1.2rem;
+}
+
+.photo-upload-preview {
+  width: 110px;
+  height: 140px;
+  margin: 0 auto 0.7rem;
+  border: 2px dashed rgba(212,168,67,0.3);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition);
+  background: var(--brown-rich);
+}
+.photo-upload-preview:hover { border-color: rgba(212,168,67,0.65); }
+.photo-upload-preview img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+.photo-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(154,117,32,0.55);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.upload-progress {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--gold-dark);
+  margin-top: 0.4rem;
+}
+.upload-progress.visible { display: flex; }
+.progress-bar-track { flex: 1; height: 2px; background: rgba(212,168,67,0.15); }
+.progress-bar-fill { height: 100%; background: var(--gold-bright); width: 0%; transition: width 0.3s; }
+
+.edit-fields .compose-textarea { min-height: 64px; resize: vertical; }
+
+/* ── FOOTER ── */
+.hof-footer { background: var(--brown-deepest); }
+
+.hof-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: rgba(212,168,67,0.3);
+  text-transform: uppercase;
+}
+
+/* ── EMPTY / LOADING STATES ── */
+.hof-loading {
+  text-align: center;
+  padding: 4rem 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: rgba(212,168,67,0.35);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .officer-modal-box { flex-direction: column; }
+  .om-photo-wrap { width: 100%; aspect-ratio: 4/3; }
+  .officers-wide, .officers-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .hof-footer-inner { flex-direction: column; gap: 0.5rem; text-align: center; }
+  .admin-toolbar { flex-direction: column; align-items: flex-start; }
+}
