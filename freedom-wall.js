@@ -1,4 +1,3 @@
-// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCk0tn7-7YhgOrtoYl2EDXjzUaW6MPLA_I",
   authDomain: "epicurus-project.firebaseapp.com",
@@ -10,11 +9,9 @@ const firebaseConfig = {
   measurementId: "G-5J2C56NQL4"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 
-// Get user's reactions from localStorage
 function getUserReactions() {
   var reactions = localStorage.getItem('epicurus_reactions');
   return reactions ? JSON.parse(reactions) : {};
@@ -32,10 +29,10 @@ function hasUserReacted(postId, reaction) {
   return reactions[postId] && reactions[postId][reaction];
 }
 
-// Selected music data
 var selectedMusic = null;
+var currentPreviewAudio = null;
+var currentPreviewBtn = null;
 
-// iTunes Search
 function searchMusic(query) {
   var resultsEl = document.getElementById('musicResults');
   if (!query || query.length < 2) {
@@ -57,7 +54,7 @@ function searchMusic(query) {
     }
     
     resultsEl.innerHTML = '';
-    tracks.slice(0, 8).forEach(function(t, i) {
+    tracks.slice(0, 8).forEach(function(t) {
       var el = document.createElement('div');
       el.className = 'music-result-item';
       el.innerHTML = 
@@ -65,8 +62,15 @@ function searchMusic(query) {
         '<div class="result-info">' +
           '<div class="result-title">' + (t.trackName || t.collectionName) + '</div>' +
           '<div class="result-artist">' + t.artistName + '</div>' +
-        '</div>';
-      el.addEventListener('click', function() {
+        '</div>' +
+        '<button class="preview-btn" data-preview="' + t.previewUrl + '">▶</button>';
+      
+      el.addEventListener('click', function(e) {
+        if (e.target.classList.contains('preview-btn')) {
+          e.stopPropagation();
+          togglePreview(e.target);
+          return;
+        }
         selectMusic({
           name: t.trackName || t.collectionName,
           artist: t.artistName,
@@ -87,7 +91,45 @@ function searchMusic(query) {
   document.head.appendChild(script);
 }
 
+function togglePreview(btn) {
+  var previewUrl = btn.dataset.preview;
+  
+  if (currentPreviewAudio && currentPreviewAudio !== btn) {
+    currentPreviewAudio.pause();
+    currentPreviewAudio = null;
+    if (currentPreviewBtn) {
+      currentPreviewBtn.textContent = '▶';
+      currentPreviewBtn.classList.remove('playing');
+    }
+  }
+  
+  if (btn.classList.contains('playing')) {
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+  } else {
+    btn.textContent = '⏸';
+    btn.classList.add('playing');
+    currentPreviewAudio = new Audio(previewUrl);
+    currentPreviewAudio.play();
+    currentPreviewBtn = btn;
+    
+    currentPreviewAudio.addEventListener('ended', function() {
+      btn.textContent = '▶';
+      btn.classList.remove('playing');
+    });
+  }
+}
+
 function selectMusic(music) {
+  if (currentPreviewAudio) {
+    currentPreviewAudio.pause();
+    currentPreviewAudio = null;
+    if (currentPreviewBtn) {
+      currentPreviewBtn.textContent = '▶';
+      currentPreviewBtn.classList.remove('playing');
+    }
+  }
+  
   selectedMusic = music;
   var selectedArt = document.getElementById('selectedArt');
   var selectedTitle = document.getElementById('selectedTitle');
@@ -108,12 +150,21 @@ function selectMusic(music) {
 }
 
 function clearSelectedMusic() {
+  if (currentPreviewAudio) {
+    currentPreviewAudio.pause();
+    currentPreviewAudio = null;
+    currentPreviewBtn = null;
+  }
+  
   selectedMusic = null;
   var musicSelected = document.getElementById('musicSelected');
-  if (musicSelected) musicSelected.style.display = 'none';
+  if (musicSelected) {
+    musicSelected.style.display = 'none';
+    var selectedArt = document.getElementById('selectedArt');
+    if (selectedArt) selectedArt.src = '';
+  }
 }
 
-// Set up music search listeners
 var musicSearchInput = document.getElementById('musicSearchInput');
 var musicSearchTimer = null;
 if (musicSearchInput) {
@@ -137,7 +188,6 @@ if (removeMusicBtn) {
   removeMusicBtn.addEventListener('click', clearSelectedMusic);
 }
 
-// Get music player HTML
 function getMusicPlayerHtml(music) {
   if (!music || !music.previewUrl) return '';
   return '<div class="post-music">' +
@@ -274,7 +324,6 @@ function renderPosts(postsData, filter) {
 }
 
 function attachPostEventListeners() {
-  // Reaction buttons
   document.querySelectorAll('.reaction-btn:not(.comment-btn):not(.delete-btn)').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var postId = this.dataset.id;
@@ -295,7 +344,6 @@ function attachPostEventListeners() {
     });
   });
 
-  // Comment toggle
   document.querySelectorAll('.comment-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var postId = this.dataset.id;
@@ -304,7 +352,6 @@ function attachPostEventListeners() {
     });
   });
 
-  // View comments toggle
   document.querySelectorAll('.comments-toggle').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var target = this.dataset.target;
@@ -312,7 +359,6 @@ function attachPostEventListeners() {
     });
   });
 
-  // Delete button
   document.querySelectorAll('.delete-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       if (confirm('Delete this post?')) {
@@ -322,7 +368,6 @@ function attachPostEventListeners() {
     });
   });
 
-  // Comment form
   document.querySelectorAll('.comment-form').forEach(function(form) {
     form.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -353,7 +398,6 @@ function renderPostsByFilter() {
   });
 }
 
-// Real-time updates
 var postsRef = db.ref('posts');
 postsRef.on('value', function(snapshot) {
   var postsData = snapshot.val();
@@ -366,7 +410,6 @@ postsRef.on('value', function(snapshot) {
   }
 });
 
-// Filter buttons
 document.querySelectorAll('.filter-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -375,7 +418,6 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
   });
 });
 
-// Form submission - with iTunes music
 var postForm = document.getElementById('postForm');
 postForm.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -389,7 +431,6 @@ postForm.addEventListener('submit', function(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span>Posting...</span>';
 
-  // Post data with iTunes music
   var postData = {
     authorName: authorName || null,
     content: content,
@@ -398,7 +439,6 @@ postForm.addEventListener('submit', function(e) {
     comments: []
   };
 
-  // Add music if selected
   if (selectedMusic) {
     postData.musicData = selectedMusic;
   }
@@ -407,10 +447,19 @@ postForm.addEventListener('submit', function(e) {
     var authorNameEl = document.getElementById('authorName');
     var postContentEl = document.getElementById('postContent');
     
-    if (authorNameEl) authorNameEl.value = '';
+  if (authorNameEl) authorNameEl.value = '';
     if (postContentEl) postContentEl.value = '';
     
-    // Clear music selection
+    if (currentPreviewAudio) {
+      currentPreviewAudio.pause();
+      currentPreviewAudio = null;
+    }
+    if (currentPreviewBtn) {
+      currentPreviewBtn.textContent = '▶';
+      currentPreviewBtn.classList.remove('playing');
+      currentPreviewBtn = null;
+    }
+    
     clearSelectedMusic();
     
     if (submitBtn) {
@@ -427,7 +476,6 @@ postForm.addEventListener('submit', function(e) {
   });
 });
 
-// Mobile menu toggle
 var hamburger = document.getElementById('hamburger');
 var mobileMenu = document.getElementById('mobileMenu');
 if (hamburger && mobileMenu) {
