@@ -47,12 +47,7 @@
     <a href="freedom-wall.html">Freedom Wall</a>
     <a href="gallery.html">Gallery</a>
     <a href="officers.html">Officers</a>
-    <a href="projects.html">Project</a>
-
-<div class="admin-controls" style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-bottom: 1rem;">
-  <button id="adminLoginBtn" class="filter-btn">Admin Login</button>
-  <button id="adminLogoutBtn" class="filter-btn" style="display: none;">Logout</button>
-</div>
+    <a href="projects.html">Projects</a>
   </div>
 </nav>
 
@@ -79,22 +74,24 @@
       </div>
 
       <textarea id="postContent" name="postContent" placeholder="What's on your mind?" class="form-textarea" rows="4" required></textarea>
-<div class="music-search-section">
-  <label class="music-search-label">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l12-2v12" stroke="#d4a843" stroke-width="2"/><circle cx="6" cy="18" r="3" stroke="#d4a843" stroke-width="2"/><circle cx="18" cy="16" r="3" stroke="#d4a843" stroke-width="2"/></svg>
-    <span>🎵 Add Music (optional)</span>
-  </label>
-  <input type="text" id="musicSearchInput" class="music-search-input" placeholder="Search for a song..." autocomplete="off">
-  <div class="music-results" id="musicResults"></div>
-  <div class="music-selected" id="musicSelected">
-    <img class="selected-art" id="selectedArt" src="" alt="">
-    <div class="selected-info">
-      <div class="selected-title" id="selectedTitle"></div>
-      <div class="selected-artist" id="selectedArtist"></div>
-      <button type="button" class="remove-music-btn" id="removeMusicBtn">✕ Remove</button>
-    </div>
-  </div>
-</div>
+      
+      <div class="music-search-section">
+        <label class="music-search-label">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l12-2v12" stroke="#d4a843" stroke-width="2"/><circle cx="6" cy="18" r="3" stroke="#d4a843" stroke-width="2"/><circle cx="18" cy="16" r="3" stroke="#d4a843" stroke-width="2"/></svg>
+          <span>🎵 Add Music (optional)</span>
+        </label>
+        <input type="text" id="musicSearchInput" class="music-search-input" placeholder="Search for a song..." autocomplete="off">
+        <div class="music-results" id="musicResults"></div>
+        <div class="music-selected" id="musicSelected">
+          <img class="selected-art" id="selectedArt" src="" alt="">
+          <div class="selected-info">
+            <div class="selected-title" id="selectedTitle"></div>
+            <div class="selected-artist" id="selectedArtist"></div>
+            <button type="button" class="remove-music-btn" id="removeMusicBtn">✕ Remove</button>
+          </div>
+        </div>
+      </div>
+      
       <button type="submit" class="submit-btn" id="submitBtn">
         <span>Post to Wall</span>
       </button>
@@ -102,6 +99,11 @@
   </section>
 
   <section class="posts-section">
+    <div class="admin-controls" style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-bottom: 1rem;">
+      <button id="adminLoginBtn" class="filter-btn admin-login-btn">Admin Login</button>
+      <button id="adminLogoutBtn" class="filter-btn admin-logout-btn" style="display: none;">Logout</button>
+    </div>
+  
     <div class="posts-header">
       <h2>Recent Posts</h2>
       <div class="filter-buttons">
