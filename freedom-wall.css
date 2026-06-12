@@ -763,6 +763,44 @@ nav {
   border: 1px solid rgba(229,115,115,0.3);
 }
 
+/* ========== POST MUSIC PLAYER CUSTOM STYLING ========== */
+.post-music audio {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  background-color: var(--brown-deepest);
+  box-shadow: inset 0 0 0 1px rgba(212,168,67,0.3);
+  outline: none;
+}
+
+.post-music audio::-webkit-media-controls-enclosure {
+  background-color: var(--brown-deepest);
+}
+
+.post-music audio::-webkit-media-controls-panel {
+  background-color: var(--brown-deepest);
+}
+
+.post-music audio::-webkit-media-controls-play-button,
+.post-music audio::-webkit-media-controls-mute-button,
+.post-music audio::-webkit-media-controls-toggle-closed-captions-button,
+.post-music audio::-webkit-media-controls-volume-slider-container {
+  filter: invert(72%) sepia(57%) saturate(394%) hue-rotate(3deg) brightness(94%) contrast(89%);
+}
+
+.post-music audio::-webkit-media-controls-current-time-display,
+.post-music audio::-webkit-media-controls-time-remaining-display {
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.post-music audio::-webkit-media-controls-timeline {
+  background-color: rgba(212, 168, 67, 0.2);
+  border-radius: 4px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 680px) {
   .nav-links { display: none; }
