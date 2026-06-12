@@ -29,6 +29,14 @@ function hasUserReacted(postId, reaction) {
   return reactions[postId] && reactions[postId][reaction];
 }
 
+function isAdmin() {
+  return localStorage.getItem('epicurus_admin') === 'true';
+}
+
+function setAdmin(status) {
+  localStorage.setItem('epicurus_admin', status ? 'true' : 'false');
+}
+
 var selectedMusic = null;
 var currentPreviewAudio = null;
 var currentPreviewBtn = null;
@@ -135,22 +143,12 @@ function selectMusic(music) {
   }
   
   selectedMusic = music;
-  var selectedArt = document.getElementById('selectedArt');
-  var selectedTitle = document.getElementById('selectedTitle');
-  var selectedArtist = document.getElementById('selectedArtist');
-  var musicSelected = document.getElementById('musicSelected');
-  
-  if (selectedArt) selectedArt.src = music.artworkUrl;
-  if (selectedTitle) selectedTitle.textContent = music.name;
-  if (selectedArtist) selectedArtist.textContent = music.artist;
-  if (musicSelected) musicSelected.style.display = 'flex';
-  
-  if (document.getElementById('musicSearchInput')) {
-    document.getElementById('musicSearchInput').value = '';
-  }
-  if (document.getElementById('musicResults')) {
-    document.getElementById('musicResults').classList.remove('show');
-  }
+  document.getElementById('selectedArt').src = music.artworkUrl;
+  document.getElementById('selectedTitle').textContent = music.name;
+  document.getElementById('selectedArtist').textContent = music.artist;
+  document.getElementById('musicSelected').style.display = 'flex';
+  document.getElementById('musicSearchInput').value = '';
+  document.getElementById('musicResults').classList.remove('show');
 }
 
 function clearSelectedMusic() {
@@ -161,12 +159,8 @@ function clearSelectedMusic() {
   }
   
   selectedMusic = null;
-  var musicSelected = document.getElementById('musicSelected');
-  if (musicSelected) {
-    musicSelected.style.display = 'none';
-    var selectedArt = document.getElementById('selectedArt');
-    if (selectedArt) selectedArt.src = '';
-  }
+  document.getElementById('musicSelected').style.display = 'none';
+  document.getElementById('selectedArt').src = '';
 }
 
 var musicSearchInput = document.getElementById('musicSearchInput');
@@ -233,6 +227,7 @@ function createPostElement(post, postId) {
 
   var authorDisplay = post.authorName || 'Anonymous';
   var musicPlayerHtml = post.musicData ? getMusicPlayerHtml(post.musicData) : '';
+  var deleteBtnHtml = isAdmin() ? '<button class="reaction-btn delete-btn" data-id="' + postId + '">🗑</button>' : '';
 
   var commentsHtml = '';
   if (post.comments && post.comments.length > 0) {
@@ -275,9 +270,7 @@ function createPostElement(post, postId) {
       '<button class="reaction-btn comment-btn" data-id="' + postId + '">' +
         '<span class="emoji">💬</span><span class="count">' + (post.comments ? post.comments.length : 0) + '</span>' +
       '</button>' +
-      '<button class="reaction-btn delete-btn" data-id="' + postId + '">' +
-        '<span>🗑</span>' +
-      '</button>' +
+      deleteBtnHtml +
     '</div>' +
     '<div class="comments-section" id="comments-' + postId + '">' +
       '<button class="comments-toggle" data-target="comments-' + postId + '">' +
@@ -364,14 +357,16 @@ function attachPostEventListeners() {
     });
   });
 
-  document.querySelectorAll('.delete-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      if (confirm('Delete this post?')) {
-        var postId = this.dataset.id;
-        db.ref('posts/' + postId).remove();
-      }
+  if (isAdmin()) {
+    document.querySelectorAll('.delete-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (confirm('Delete this post?')) {
+          var postId = this.dataset.id;
+          db.ref('posts/' + postId).remove();
+        }
+      });
     });
-  });
+  }
 
   document.querySelectorAll('.comment-form').forEach(function(form) {
     form.addEventListener('submit', function(e) {
@@ -386,11 +381,7 @@ function attachPostEventListeners() {
         var post = snapshot.val();
         if (post) {
           var comments = post.comments || [];
-          comments.push({ 
-            content: content, 
-            author: 'Anonymous', 
-            timestamp: Date.now() 
-          });
+          comments.push({ content: content, author: 'Anonymous', timestamp: Date.now() });
           postRef.update({ comments: comments });
         }
       });
@@ -437,6 +428,16 @@ if (postForm) {
     var postContentEl = document.getElementById('postContent');
     
     var authorName = authorNameEl ? authorNameEl.value.trim() : '';
+    var content = postContentEl ? postContentEl.value.trim() : '';
+
+    if (!content) return;
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Posting...</span>';
+    }
+
+     var authorName = authorNameEl ? authorNameEl.value.trim() : '';
     var content = postContentEl ? postContentEl.value.trim() : '';
 
     if (!content) return;
@@ -502,4 +503,34 @@ if (hamburger && mobileMenu) {
       hamburger.setAttribute('aria-expanded', 'false');
     });
   });
+}
+
+var adminLoginBtn = document.getElementById('adminLoginBtn');
+if (adminLoginBtn) {
+  adminLoginBtn.addEventListener('click', function() {
+    var password = prompt('Enter admin password:');
+    if (password === 'EPICURUS2027') {
+      setAdmin(true);
+      alert('Admin mode activated!');
+      renderPostsByFilter();
+    } else {
+      alert('Incorrect password!');
+    }
+  });
+}
+
+var adminLogoutBtn = document.getElementById('adminLogoutBtn');
+if (adminLogoutBtn) {
+  adminLogoutBtn.addEventListener('click', function() {
+    setAdmin(false);
+    alert('Admin mode deactivated!');
+    renderPostsByFilter();
+  });
+}
+
+if (isAdmin()) {
+  var adminIndicator = document.getElementById('adminIndicator');
+  if (adminIndicator) {
+    adminIndicator.style.display = 'flex';
+  }
 }
