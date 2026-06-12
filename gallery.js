@@ -12,6 +12,8 @@ const firebaseConfig = {
   measurementId: "G-5J2C56NQL4"
 };
 
+const IMGBB_API_KEY = "c21af3a036d8272c19c7e7f1ae15df6b1";
+
 initializeApp(firebaseConfig);
 const db = getDatabase();
 
@@ -30,22 +32,20 @@ function getPhotosRef() {
   return ref(db, 'gallery');
 }
 
-async function uploadToCloudinary(file) {
-  const cloudName = "epicurus-project";
+async function uploadImage(file) {
   const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', "epicurus_gallery");
+  formData.append('image', file);
+  formData.append('key', IMGBB_API_KEY);
   
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+  const response = await fetch('https://api.imgbb.com/1/upload', {
     method: 'POST',
     body: formData
   });
   
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error);
-  }
-  return response.json();
+  if (!response.ok) throw new Error('Upload failed');
+  const data = await response.json();
+  if (!data.success) throw new Error(data.error.message);
+  return data.data;
 }
 
 function loadGallery(filter = 'all') {
@@ -294,10 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
     status.textContent = 'Uploading...';
     
     try {
-      const result = await uploadToCloudinary(window.pendingFile);
+      const result = await uploadImage(window.pendingFile);
       
       push(getPhotosRef(), {
-        imageUrl: result.secure_url,
+        imageUrl: result.url,
+        thumbnailUrl: result.thumb.url,
         caption,
         eventDate: document.getElementById('uploadDate').value,
         location: document.getElementById('uploadLocation').value,
