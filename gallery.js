@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, push, onValue, update, remove, set, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCk0tn7-7YhgOrtoYl2EDXjzUaW6MPLA_I",
@@ -11,9 +11,6 @@ const firebaseConfig = {
   appId: "1:605298370739:web:972e4ac5028334971068c6",
   measurementId: "G-5J2C56NQL4"
 };
-
-const cloudName = "epicurus-project";
-const uploadPreset = "gallery_images";
 
 initializeApp(firebaseConfig);
 const db = getDatabase();
@@ -34,16 +31,20 @@ function getPhotosRef() {
 }
 
 async function uploadToCloudinary(file) {
+  const cloudName = "epicurus-project";
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('upload_preset', uploadPreset);
+  formData.append('upload_preset', "epicurus_gallery");
   
   const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
     method: 'POST',
     body: formData
   });
   
-  if (!response.ok) throw new Error('Upload failed');
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
   return response.json();
 }
 
@@ -55,7 +56,7 @@ function loadGallery(filter = 'all') {
   onValue(getPhotosRef(), (snapshot) => {
     const data = snapshot.val();
     allPhotos = data ? Object.entries(data).map(([id, photo]) => ({ id, ...photo })) : [];
-    allPhotos.sort((a, b) => (b.date || 0) - (a.date || 0));
+    allPhotos.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     
     const filtered = filter === 'all' 
       ? allPhotos 
@@ -150,8 +151,7 @@ function closeLightbox() {
 }
 
 function navigateLightbox(direction) {
-  const filtered = allPhotos;
-  currentPhotoIndex = (currentPhotoIndex + direction + filtered.length) % filtered.length;
+  currentPhotoIndex = (currentPhotoIndex + direction + allPhotos.length) % allPhotos.length;
   openLightbox(currentPhotoIndex);
 }
 
@@ -162,7 +162,7 @@ function toggleHeart() {
   
   if (hasHearted) {
     localStorage.setItem(key, 'false');
-    update(ref(db, `gallery/${photo.id}/hearts`), { hearts: (photo.hearts || 1) - 1 });
+    update(ref(db, `gallery/${photo.id}/hearts`), { hearts: Math.max(0, (photo.hearts || 1) - 1) });
   } else {
     localStorage.setItem(key, 'true');
     update(ref(db, `gallery/${photo.id}/hearts`), { hearts: (photo.hearts || 0) + 1 });
@@ -197,11 +197,34 @@ function addComment() {
   input.value = '';
 }
 
+function savePhotoEdits() {
+  const photo = allPhotos[currentPhotoIndex];
+  update(ref(db, `gallery/${photo.id}`), {
+    caption: document.getElementById('lbEditCaption').value,
+    location: document.getElementById('lbEditLocation').value
+  });
+  showToast('Changes saved!');
+}
+
+function deletePhoto() {
+  const photo = allPhotos[currentPhotoIndex];
+  if (confirm('Delete this memory?')) {
+    remove(ref(db, `gallery/${photo.id}`));
+    closeLightbox();
+    showToast('Memory deleted');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadGallery();
   
-  document.getElementById('adminToggleBtn').addEventListener('click', () => {
+  document.getElementById('adminToggleBtn')?.addEventListener('click', () => {
     document.getElementById('adminModal').classList.add('show');
+  });
+  
+  document.getElementById('adminToggleBtnMobile')?.addEventListener('click', () => {
+    document.getElementById('adminModal').classList.add('show');
+    document.getElementById('mobileMenu').classList.remove('open');
   });
   
   document.getElementById('modalClose').addEventListener('click', () => {
@@ -229,6 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lbNext').addEventListener('click', () => navigateLightbox(1));
   document.getElementById('lbHeartBtn').addEventListener('click', toggleHeart);
   document.getElementById('lbCommentSend').addEventListener('click', addComment);
+  document.getElementById('lbSaveBtn').addEventListener('click', savePhotoEdits);
+  document.getElementById('lbDeleteBtn').addEventListener('click', deletePhoto);
   
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('imageFileInput');
@@ -287,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('uploadPreviewWrap').classList.remove('show');
     } catch (err) {
       showToast('Upload failed: ' + err.message, true);
+      status.textContent = '';
     }
   });
 });
