@@ -1,257 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming Soon — Epicurus</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --bg-paper: #f9f6f0;
-      --ink-black: #2b1e17;
-      --epicurus-gold: #c5a059;
-      --gold-glow: rgba(197, 160, 89, 0.15);
-      --white: #ffffff;
-      --thin-border: 1px solid rgba(43, 30, 23, 0.2);
-      --thick-border: 2px solid #2b1e17;
-      --font-serif: 'Cormorant Garamond', serif;
-      --font-sans: 'DM Sans', sans-serif;
-      --font-display: 'Cinzel', serif;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Epicurus — Memory Gallery</title>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
 
-    body {
-      background-color: var(--bg-paper);
-      color: var(--ink-black);
-      font-family: var(--font-sans), sans-serif;
-      line-height: 1.5;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    nav {
-      background-color: var(--bg-paper);
-      border-bottom: var(--thick-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .nav-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.25rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--ink-black);
-      text-decoration: none;
-    }
-
-    .nav-logo-icon {
-      width: 28px;
-      height: 28px;
-    }
-
-    .nav-links {
-      display: flex;
-      list-style: none;
-      gap: 2rem;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--ink-black);
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: color 0.3s;
-    }
-
-    .nav-links a:hover {
-      color: var(--epicurus-gold);
-    }
-
-    .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .hamburger span {
-      width: 24px;
-      height: 2px;
-      background-color: var(--ink-black);
-      transition: all 0.3s ease;
-    }
-
-    .hamburger.open span:nth-child(1) {
-      transform: translateY(7px) rotate(45deg);
-    }
-
-    .hamburger.open span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .hamburger.open span:nth-child(3) {
-      transform: translateY(-7px) rotate(-45deg);
-    }
-
-    .mobile-menu {
-      display: none;
-      background-color: var(--bg-paper);
-      border-bottom: var(--thick-border);
-      padding: 1rem 1.5rem;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .mobile-menu a {
-      text-decoration: none;
-      color: var(--ink-black);
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .construction-main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 1.5rem;
-    }
-
-    .construction-container {
-      max-width: 600px;
-      width: 100%;
-      text-align: center;
-      border: var(--thick-border);
-      background-color: var(--white);
-      padding: 4rem 2.5rem;
-      box-shadow: 12px 12px 0px var(--ink-black);
-      position: relative;
-    }
-
-    .construction-container::before {
-      content: '';
-      position: absolute;
-      top: 6px; left: 6px; right: 6px; bottom: 6px;
-      border: 1px solid rgba(43, 30, 23, 0.15);
-      pointer-events: none;
-    }
-
-    .monument-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 1.5rem auto;
-      animation: pulseGlow 3s infinite ease-in-out;
-    }
-
-    .eyebrow {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      color: var(--epicurus-gold);
-      margin-bottom: 0.75rem;
-    }
-
-    .construction-title {
-      font-family: var(--font-display);
-      font-size: 2.25rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
-    }
-
-    .construction-quote {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 1.2rem;
-      opacity: 0.8;
-      margin-bottom: 2.5rem;
-      line-height: 1.6;
-    }
-
-    .back-home-btn {
-      display: inline-block;
-      background-color: transparent;
-      border: var(--thick-border);
-      color: var(--ink-black);
-      padding: 0.8rem 2rem;
-      font-family: var(--font-display);
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .back-home-btn:hover {
-      background-color: var(--ink-black);
-      color: var(--bg-paper);
-      box-shadow: 0 4px 15px var(--gold-glow);
-    }
-
-    .page-footer {
-      background-color: var(--ink-black);
-      color: var(--bg-paper);
-      text-align: center;
-      padding: 2rem 1rem;
-      font-family: var(--font-display);
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      border-top: var(--thin-border);
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 8px var(--epicurus-gold)); }
-    }
-
-    @media (max-width: 768px) {
-      .hamburger { display: flex; }
-      .nav-links { display: none; }
-      .mobile-menu.active { display: flex; }
-      .construction-container { padding: 3rem 1.5rem; }
-      .construction-title { font-size: 1.75rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="gallery.css" />
 </head>
 <body>
 
 <nav role="banner">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">
-      <svg class="nav-logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="nav-logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <ellipse cx="16" cy="10" rx="7" ry="3.5" stroke="#d4a843" stroke-width="1.2" fill="none"/>
         <line x1="9" y1="10" x2="9" y2="26" stroke="#d4a843" stroke-width="1.2"/>
         <line x1="23" y1="10" x2="23" y2="26" stroke="#d4a843" stroke-width="1.2"/>
@@ -261,62 +28,157 @@
       Epicurus
     </a>
 
-    <ul class="nav-links">
+    <ul class="nav-links" role="list">
       <li><a href="index.html">Home</a></li>
       <li><a href="freedom-wall.html">Freedom Wall</a></li>
-      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="gallery.html" class="active">Gallery</a></li>
       <li><a href="hall-of-fame.html">Officers</a></li>
       <li><a href="projects.html">Projects</a></li>
+      <li><button class="admin-nav-btn" id="adminToggleBtn" title="Admin Access">⚡</button></li>
     </ul>
 
-    <button class="hamburger" id="hamburger">
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 
-  <div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile navigation">
     <a href="index.html">Home</a>
     <a href="freedom-wall.html">Freedom Wall</a>
     <a href="gallery.html">Gallery</a>
     <a href="hall-of-fame.html">Officers</a>
     <a href="projects.html">Projects</a>
+    <button class="admin-nav-btn" id="adminToggleBtnMobile" title="Admin Access">⚡ Admin</button>
   </div>
 </nav>
 
-<main class="construction-main">
-  <div class="construction-container">
-    <div class="monument-icon">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="16" cy="10" rx="7" ry="3.5" stroke="#c5a059" stroke-width="1"/>
-        <line x1="9" y1="10" x2="9" y2="26" stroke="#c5a059" stroke-width="1"/>
-        <line x1="16" y1="13.5" x2="16" y2="26" stroke="#c5a059" stroke-width="1" stroke-dasharray="2 2"/>
-        <line x1="23" y1="10" x2="23" y2="26" stroke="#c5a059" stroke-width="1"/>
-        <line x1="5" y1="26" x2="27" y2="26" stroke="#2b1e17" stroke-width="2"/>
-      </svg>
-    </div>
-    
-    <p class="eyebrow">Under Construction</p>
-    <h1 class="construction-title">Cultivating the Space</h1>
-    <p class="construction-quote">"The premium infrastructure for this section is currently being chiseled into place. Return shortly to witness the final installation."</p>
-    
-    <div class="action-zone">
-      <a href="index.html" class="back-home-btn">Return To Home</a>
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose"><i data-lucide="x"></i></button>
+      <div class="modal-icon"><i data-lucide="shield-check"></i></div>
+      <h2 class="modal-title">Admin Access</h2>
+      <p class="modal-sub">Enter the passphrase to unlock gallery management.</p>
+      <input
+        type="password"
+        id="adminPasswordInput"
+        class="modal-input"
+        placeholder="Enter passphrase…"
+        autocomplete="off"
+      />
+      <p class="modal-error" id="modalError"></p>
+      <button class="modal-submit" id="modalSubmit">Unlock</button>
     </div>
   </div>
-</main>
 
-<footer class="page-footer">
-  <p>Epicurus Hall of Fame © 2026</p>
-</footer>
+  <section class="admin-upload-panel" id="adminUploadPanel">
+    <h3>⬡ Curator's Upload Desk</h3>
+    <div class="upload-form">
+      <div class="upload-drop-zone" id="dropZone">
+        <i data-lucide="image-plus"></i>
+        <p>Drop an image here, or <label for="imageFileInput" class="upload-label-link">browse</label></p>
+        <input type="file" id="imageFileInput" accept="image/*" hidden />
+        <div class="upload-preview-wrap" id="uploadPreviewWrap">
+          <img id="uploadPreview" src="" alt="Preview" />
+        </div>
+      </div>
+      <div class="upload-fields">
+        <label class="field-label">Caption <span class="field-req">*</span></label>
+        <textarea id="uploadCaption" class="field-input" rows="3" placeholder="Describe this memory…"></textarea>
 
-<script>
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobileMenu');
+        <label class="field-label">Event Date</label>
+        <input type="date" id="uploadDate" class="field-input" />
 
-  hamburger.addEventListener('click', () => {
-    mobileMenu.classList.toggle('active');
-    hamburger.classList.toggle('open');
-  });
-</script>
+        <label class="field-label">Location / Trivia</label>
+        <input type="text" id="uploadLocation" class="field-input" placeholder="e.g. Room 204, 3 AM banner printing…" />
+
+        <label class="field-label">Tags <span class="field-hint">(comma-separated)</span></label>
+        <input type="text" id="uploadTags" class="field-input" placeholder="e.g. Retreat, Night-out, Leadership" />
+
+        <button class="upload-submit-btn" id="uploadSubmitBtn">
+          <i data-lucide="upload-cloud"></i> Publish Memory
+        </button>
+        <p class="upload-status" id="uploadStatus"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallery-hero">
+    <p class="hero-eyebrow">Catalogued Memories</p>
+    <h1 class="hero-title">The Archive</h1>
+    <p class="hero-sub">Every photograph a pressed flower — fragile, preserved, eternal.</p>
+    <div class="hero-rule"><span></span><i data-lucide="aperture"></i><span></span></div>
+  </section>
+
+  <nav class="gallery-nav" id="galleryNav">
+    <button class="gallery-filter active" data-filter="all">All Memories</button>
+  </nav>
+
+  <main class="gallery-grid" id="galleryGrid">
+    <div class="gallery-empty" id="galleryEmpty">
+      <i data-lucide="camera-off"></i>
+      <p>No memories yet. Be the first to add one.</p>
+    </div>
+  </main>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <div class="lightbox-content">
+
+      <div class="lightbox-viewer" id="lightboxViewer">
+        <button class="lightbox-nav lb-prev" id="lbPrev" aria-label="Previous photo">
+          <i data-lucide="chevron-left"></i>
+        </button>
+        <img id="lightboxImg" src="" alt="" />
+        <button class="lightbox-nav lb-next" id="lbNext" aria-label="Next photo">
+          <i data-lucide="chevron-right"></i>
+        </button>
+        <button class="close-lightbox" id="closeLightbox" aria-label="Close viewer">
+          <i data-lucide="x"></i>
+        </button>
+
+        <button class="lb-heart-btn" id="lbHeartBtn" aria-label="Love this memory">
+          <i data-lucide="heart"></i>
+          <span id="lbHeartCount">0</span>
+        </button>
+      </div>
+
+      <aside class="lightbox-sidebar" id="lightboxSidebar">
+        <div class="lb-sidebar-top">
+          <p class="lb-date" id="lbDate"></p>
+          <p class="lb-caption" id="lbCaption"></p>
+          <p class="lb-location" id="lbLocation"></p>
+          <div class="lb-tags" id="lbTags"></div>
+        </div>
+
+        <div class="lb-admin-tools" id="lbAdminTools">
+          <hr class="lb-divider" />
+          <p class="lb-admin-label">Admin Tools</p>
+          <textarea class="lb-edit-caption" id="lbEditCaption" rows="3" placeholder="Edit caption…"></textarea>
+          <input type="text" class="lb-edit-location" id="lbEditLocation" placeholder="Edit location / trivia…" />
+          <div class="lb-admin-actions">
+            <button class="lb-save-btn" id="lbSaveBtn"><i data-lucide="save"></i> Save</button>
+            <button class="lb-delete-btn" id="lbDeleteBtn"><i data-lucide="trash-2"></i> Delete</button>
+          </div>
+        </div>
+
+        <div class="lb-comments-section">
+          <hr class="lb-divider" />
+          <p class="lb-comments-label">Quick Memories</p>
+          <div class="lb-comments-list" id="lbCommentsList"></div>
+          <div class="lb-comment-input-row">
+            <input type="text" class="lb-comment-input" id="lbCommentInput" placeholder="Drop a memory…" maxlength="200" />
+            <button class="lb-comment-send" id="lbCommentSend"><i data-lucide="send"></i></button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="gallery.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+  </script>
 </body>
 </html>
