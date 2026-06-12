@@ -4,7 +4,7 @@
   --brown-deepest: #1a0e06;
   --brown-deep:    #2b1608;
   --brown-rich:    #3d1f0a;
-  --brown-mid:    #5c2e10;
+  --brown-mid:     #5c2e10;
   --gold-bright: #d4a843;
   --gold-light:  #f0cc72;
   --gold-pale:   #faeab0;
@@ -23,7 +23,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ========== NAVIGATION ========== */
 nav {
   position: sticky;
   top: 0;
@@ -129,7 +128,6 @@ nav {
   border-bottom: 1px solid rgba(212,168,67,0.1);
 }
 
-/* ========== MAIN CONTENT ========== */
 .wall-main {
   max-width: 800px;
   margin: 0 auto;
@@ -157,7 +155,6 @@ nav {
   margin-top: 0.5rem;
 }
 
-/* ========== POST FORM ========== */
 .create-post {
   background: var(--brown-deep);
   border: 1px solid rgba(212,168,67,0.25);
@@ -247,7 +244,6 @@ nav {
   transform: none;
 }
 
-/* ========== MUSIC SEARCH ========== */
 .music-search-section {
   margin-top: 0.5rem;
 }
@@ -287,7 +283,6 @@ nav {
   border-color: var(--gold-bright);
 }
 
-/* Search Results */
 .music-results {
   display: none;
   background: rgba(26,14,6,0.98);
@@ -399,7 +394,6 @@ nav {
   font-style: italic;
 }
 
-/* Selected Music */
 .music-selected {
   display: none;
   align-items: center;
@@ -453,7 +447,6 @@ nav {
   background: rgba(229,115,115,0.4);
 }
 
-/* ========== POSTS SECTION ========== */
 .posts-header {
   display: flex;
   align-items: center;
@@ -501,7 +494,6 @@ nav {
   font-style: italic;
 }
 
-/* ========== POST CARD ========== */
 .post-card {
   background: var(--brown-deep);
   border: 1px solid rgba(212,168,67,0.2);
@@ -564,7 +556,6 @@ nav {
   word-wrap: break-word;
 }
 
-/* ========== POST MUSIC PLAYER ========== */
 .post-music {
   margin-bottom: 1rem;
   padding: 0.75rem;
@@ -605,11 +596,41 @@ nav {
 
 .post-music audio {
   width: 100%;
-  height: 36px;
-  border-radius: 4px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: var(--brown-deepest);
+  box-shadow: inset 0 0 0 1px rgba(212,168,67,0.3);
+  outline: none;
 }
 
-/* ========== REACTIONS ========== */
+.post-music audio::-webkit-media-controls-enclosure {
+  background-color: var(--brown-deepest);
+}
+
+.post-music audio::-webkit-media-controls-panel {
+  background-color: var(--brown-deepest);
+}
+
+.post-music audio::-webkit-media-controls-play-button,
+.post-music audio::-webkit-media-controls-mute-button,
+.post-music audio::-webkit-media-controls-toggle-closed-captions-button,
+.post-music audio::-webkit-media-controls-volume-slider-container {
+  filter: invert(72%) sepia(57%) saturate(394%) hue-rotate(3deg) brightness(94%) contrast(89%);
+}
+
+.post-music audio::-webkit-media-controls-current-time-display,
+.post-music audio::-webkit-media-controls-time-remaining-display {
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.post-music audio::-webkit-media-controls-timeline {
+  background-color: rgba(212, 168, 67, 0.2);
+  border-radius: 4px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 .post-actions {
   display: flex;
   flex-wrap: wrap;
@@ -650,7 +671,6 @@ nav {
 .reaction-btn .emoji { font-size: 1rem; }
 .reaction-btn .count { font-weight: 600; }
 
-/* Delete button */
 .delete-btn {
   margin-left: auto;
   color: #e57373 !important;
@@ -662,7 +682,6 @@ nav {
   color: var(--brown-deepest) !important;
 }
 
-/* ========== COMMENTS ========== */
 .comments-section {
   margin-top: 1rem;
   padding-top: 1rem;
@@ -754,7 +773,6 @@ nav {
   color: var(--cream);
 }
 
-/* ========== ERROR ========== */
 .error-message {
   text-align: center;
   padding: 2rem;
@@ -763,45 +781,6 @@ nav {
   border: 1px solid rgba(229,115,115,0.3);
 }
 
-/* ========== POST MUSIC PLAYER CUSTOM STYLING ========== */
-.post-music audio {
-  width: 100%;
-  height: 40px;
-  border-radius: 8px;
-  background-color: var(--brown-deepest);
-  box-shadow: inset 0 0 0 1px rgba(212,168,67,0.3);
-  outline: none;
-}
-
-.post-music audio::-webkit-media-controls-enclosure {
-  background-color: var(--brown-deepest);
-}
-
-.post-music audio::-webkit-media-controls-panel {
-  background-color: var(--brown-deepest);
-}
-
-.post-music audio::-webkit-media-controls-play-button,
-.post-music audio::-webkit-media-controls-mute-button,
-.post-music audio::-webkit-media-controls-toggle-closed-captions-button,
-.post-music audio::-webkit-media-controls-volume-slider-container {
-  filter: invert(72%) sepia(57%) saturate(394%) hue-rotate(3deg) brightness(94%) contrast(89%);
-}
-
-.post-music audio::-webkit-media-controls-current-time-display,
-.post-music audio::-webkit-media-controls-time-remaining-display {
-  color: var(--cream);
-  font-family: 'Cormorant Garamond', serif;
-}
-
-.post-music audio::-webkit-media-controls-timeline {
-  background-color: rgba(212, 168, 67, 0.2);
-  border-radius: 4px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-/* ========== RESPONSIVE ========== */
 @media (max-width: 680px) {
   .nav-links { display: none; }
   .hamburger { display: flex; }
