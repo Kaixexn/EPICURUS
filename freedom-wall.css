@@ -534,27 +534,28 @@ nav {
   word-wrap: break-word;
 }
 
-.music-input-section {
+/* ========== MUSIC SEARCH ========== */
+.music-search-section {
   margin-top: 0.5rem;
 }
 
-.music-label {
+.music-search-label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-family: 'Cinzel', serif;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--gold-bright);
   cursor: pointer;
   margin-bottom: 0.5rem;
 }
 
-.music-label svg {
-  width: 20px;
-  height: 20px;
+.music-search-label svg {
+  width: 18px;
+  height: 18px;
 }
 
-.music-link-input {
+.music-search-input {
   width: 100%;
   padding: 0.75rem 1rem;
   font-family: 'Cormorant Garamond', serif;
@@ -564,22 +565,162 @@ nav {
   border: 1px solid rgba(212,168,67,0.3);
 }
 
-.music-link-input::placeholder {
+.music-search-input::placeholder {
   color: rgba(253,246,227,0.4);
 }
 
-.music-link-input:focus {
-  border-color: var(--gold-bright);
+.music-search-input:focus {
   outline: none;
+  border-color: var(--gold-bright);
 }
 
+/* Search Results */
+.music-results {
+  display: none;
+  background: rgba(26,14,6,0.95);
+  border: 1px solid rgba(212,168,67,0.3);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 0.25rem;
+}
+
+.music-results.show {
+  display: block;
+}
+
+.music-result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(212,168,67,0.15);
+}
+
+.music-result-item:hover {
+  background: rgba(212,168,67,0.15);
+}
+
+.music-result-item:last-child {
+  border-bottom: none;
+}
+
+.music-result-item .result-art {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.music-result-item .result-info {
+  flex: 1;
+}
+
+.music-result-item .result-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: var(--gold-bright);
+}
+
+.music-result-item .result-artist {
+  font-size: 0.75rem;
+  color: rgba(253,246,227,0.6);
+}
+
+.music-result-empty {
+  padding: 1rem;
+  text-align: center;
+  color: rgba(253,246,227,0.5);
+  font-style: italic;
+}
+
+/* Selected Music */
+.music-selected {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(212,168,67,0.15);
+  border: 1px solid var(--gold-bright);
+  margin-top: 0.5rem;
+}
+
+.music-selected .selected-art {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.music-selected .selected-info {
+  flex: 1;
+}
+
+.music-selected .selected-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: var(--gold-bright);
+}
+
+.music-selected .selected-artist {
+  font-size: 0.8rem;
+  color: rgba(253,246,227,0.7);
+}
+
+.remove-music-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  color: #e57373;
+  background: rgba(229,115,115,0.2);
+  border: 1px solid rgba(229,115,115,0.3);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.remove-music-btn:hover {
+  background: rgba(229,115,115,0.3);
+}
+
+/* Post Music Player */
 .post-music {
   margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(212,168,67,0.1);
   border: 1px solid rgba(212,168,67,0.3);
 }
 
-.post-music iframe {
+.post-music .music-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-music .music-info img {
+  width: 40px;
+  height: 40px;
   border-radius: 4px;
+}
+
+.post-music .music-info div {
+  flex: 1;
+}
+
+.post-music .music-info strong {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: var(--gold-bright);
+  display: block;
+}
+
+.post-music .music-info span {
+  font-size: 0.75rem;
+  color: rgba(253,246,227,0.6);
+}
+
+.post-music audio {
+  width: 100%;
+  height: 30px;
 }
 
 /* ========== ERROR MESSAGE ========== */
