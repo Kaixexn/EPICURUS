@@ -35,6 +35,20 @@ function isAdmin() {
 
 function setAdmin(status) {
   localStorage.setItem('epicurus_admin', status ? 'true' : 'false');
+  updateAdminUI();
+}
+
+function updateAdminUI() {
+  var adminIndicator = document.getElementById('adminIndicator');
+  var controls = document.querySelector('.admin-controls');
+  
+  if (isAdmin()) {
+    if (adminIndicator) adminIndicator.style.display = 'flex';
+    if (controls) controls.classList.add('logged-in');
+  } else {
+    if (adminIndicator) adminIndicator.style.display = 'none';
+    if (controls) controls.classList.remove('logged-in');
+  }
 }
 
 var selectedMusic = null;
@@ -437,16 +451,6 @@ if (postForm) {
       submitBtn.innerHTML = '<span>Posting...</span>';
     }
 
-     var authorName = authorNameEl ? authorNameEl.value.trim() : '';
-    var content = postContentEl ? postContentEl.value.trim() : '';
-
-    if (!content) return;
-
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>Posting...</span>';
-    }
-
     var postData = {
       authorName: authorName || null,
       content: content,
@@ -505,32 +509,69 @@ if (hamburger && mobileMenu) {
   });
 }
 
+/* ========== CUSTOM THEMED MODAL INJECTION & INTERACTION ========== */
+document.body.insertAdjacentHTML('beforeend', `
+  <div class="admin-modal-overlay" id="adminModalOverlay">
+    <div class="admin-modal">
+      <h3>Enter Admin Password</h3>
+      <input type="password" id="adminPasswordInput" class="form-input" placeholder="••••••••">
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="adminCancelBtn">Cancel</button>
+        <button class="modal-btn confirm" id="adminConfirmBtn">Access</button>
+      </div>
+    </div>
+  </div>
+`);
+
+var adminModalOverlay = document.getElementById('adminModalOverlay');
+var adminPasswordInput = document.getElementById('adminPasswordInput');
 var adminLoginBtn = document.getElementById('adminLoginBtn');
+var adminLogoutBtn = document.getElementById('adminLogoutBtn');
+var adminCancelBtn = document.getElementById('adminCancelBtn');
+var adminConfirmBtn = document.getElementById('adminConfirmBtn');
+
 if (adminLoginBtn) {
   adminLoginBtn.addEventListener('click', function() {
-    var password = prompt('Enter admin password:');
-    if (password === 'EPICURUS2027') {
-      setAdmin(true);
-      alert('Admin mode activated!');
-      renderPostsByFilter();
-    } else {
-      alert('Incorrect password!');
-    }
+    if (adminPasswordInput) adminPasswordInput.value = '';
+    if (adminModalOverlay) adminModalOverlay.classList.add('show');
+    if (adminPasswordInput) adminPasswordInput.focus();
   });
 }
 
-var adminLogoutBtn = document.getElementById('adminLogoutBtn');
+function closeAdminModal() {
+  if (adminModalOverlay) adminModalOverlay.classList.remove('show');
+}
+
+if (adminCancelBtn) adminCancelBtn.addEventListener('click', closeAdminModal);
+
+function handleAdminSubmit() {
+  if (!adminPasswordInput) return;
+  var password = adminPasswordInput.value;
+  
+  if (password === 'EPICURUS2027') {
+    setAdmin(true);
+    closeAdminModal();
+    renderPostsByFilter();
+  } else {
+    alert('Incorrect password!');
+    adminPasswordInput.value = '';
+    adminPasswordInput.focus();
+  }
+}
+
+if (adminConfirmBtn) adminConfirmBtn.addEventListener('click', handleAdminSubmit);
+if (adminPasswordInput) {
+  adminPasswordInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') handleAdminSubmit();
+  });
+}
+
 if (adminLogoutBtn) {
   adminLogoutBtn.addEventListener('click', function() {
     setAdmin(false);
-    alert('Admin mode deactivated!');
     renderPostsByFilter();
   });
 }
 
-if (isAdmin()) {
-  var adminIndicator = document.getElementById('adminIndicator');
-  if (adminIndicator) {
-    adminIndicator.style.display = 'flex';
-  }
-}
+// Initialization validation pass on page boot
+updateAdminUI();
