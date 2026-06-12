@@ -691,26 +691,20 @@ nav {
   width: 100%;
   height: 40px;
   border-radius: 4px;
-  background-color: #2b1608; 
+  background-color: #2b1608;
   outline: none;
-  display: block;
 }
 
 .post-music audio::-webkit-media-controls-enclosure {
   background-color: #2b1608;
-  border-radius: 4px;
-  border: 1px solid rgba(212,168,67,0.3);
 }
 
 .post-music audio::-webkit-media-controls-panel {
   background-color: #2b1608;
-  display: flex;
 }
 
 .post-music audio::-webkit-media-controls-play-button,
-.post-music audio::-webkit-media-controls-mute-button,
-.post-music audio::-webkit-media-controls-toggle-closed-captions-button,
-.post-music audio::-webkit-media-controls-volume-slider-container {
+.post-music audio::-webkit-media-controls-mute-button {
   filter: invert(72%) sepia(57%) saturate(394%) hue-rotate(3deg) brightness(94%) contrast(89%);
 }
 
@@ -718,15 +712,13 @@ nav {
 .post-music audio::-webkit-media-controls-time-remaining-display {
   color: var(--cream);
   font-family: 'Cormorant Garamond', serif;
-  font-size: 0.85rem;
-  text-shadow: none;
 }
 
 .post-music audio::-webkit-media-controls-timeline {
-  background-color: rgba(212, 168, 67, 0.1);
+  background-color: rgba(212,168,67,0.2);
   border-radius: 2px;
-  padding: 0;
 }
+
 /* ========== REACTIONS ========== */
 .post-actions {
   display: flex;
@@ -766,17 +758,6 @@ nav {
 .reaction-btn .emoji { font-size: 1rem; }
 .reaction-btn .count { font-weight: 600; }
 
-.delete-btn {
-  margin-left: auto;
-  color: #e57373 !important;
-  border-color: rgba(229,115,115,0.3) !important;
-}
-
-.delete-btn:hover {
-  background: #e57373 !important;
-  color: var(--brown-deepest) !important;
-}
-
 /* ========== COMMENTS ========== */
 .comments-section {
   margin-top: 1rem;
@@ -796,7 +777,6 @@ nav {
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: color 0.2s;
 }
 
 .comments-toggle:hover { color: var(--gold-light); }
@@ -816,7 +796,6 @@ nav {
   background: rgba(26,14,6,0.5);
   border: 1px solid rgba(212,168,67,0.25);
   outline: none;
-  transition: border-color 0.2s;
 }
 
 .comment-input::placeholder { color: rgba(253,246,227,0.4); }
@@ -832,13 +811,9 @@ nav {
   background: var(--gold-bright);
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
-.comment-submit:hover { 
-  background: var(--gold-light);
-  box-shadow: 0 0 15px rgba(212,168,67,0.3);
-}
+.comment-submit:hover { background: var(--gold-light); }
 
 .comments-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
@@ -846,7 +821,6 @@ nav {
   padding: 0.75rem;
   background: rgba(26,14,6,0.4);
   border-left: 2px solid var(--gold-dark);
-  border-radius: 0 2px 2px 0;
 }
 
 .comment-header {
@@ -876,15 +850,6 @@ nav {
   color: var(--cream);
 }
 
-.error-message {
-  text-align: center;
-  padding: 2rem;
-  color: #e57373;
-  background: rgba(229,115,115,0.1);
-  border: 1px solid rgba(229,115,115,0.3);
-  border-radius: 4px;
-}
-
 /* ========== ADMIN CONTROLS ========== */
 .admin-controls {
   display: flex;
@@ -893,17 +858,9 @@ nav {
   margin-bottom: 1rem;
 }
 
-.admin-controls #adminLogoutBtn {
-  display: none;
-}
-
-.admin-controls.logged-in #adminLoginBtn {
-  display: none;
-}
-
-.admin-controls.logged-in #adminLogoutBtn {
-  display: block;
-}
+.admin-controls #adminLogoutBtn { display: none; }
+.admin-controls.logged-in #adminLoginBtn { display: none; }
+.admin-controls.logged-in #adminLogoutBtn { display: block; }
 
 .admin-controls .filter-btn {
   padding: 0.4rem 0.8rem;
@@ -918,33 +875,11 @@ nav {
   transition: all 0.2s;
 }
 
-.admin-controls .filter-btn:hover,
-.admin-controls .filter-btn.active {
+.admin-controls .filter-btn:hover {
   color: var(--brown-deepest);
   background: var(--gold-bright);
-  border-color: var(--gold-bright);
-  box-shadow: 0 0 15px rgba(212,168,67,0.3);
 }
 
-/* Admin indicator badge */
-.admin-indicator {
-  display: none;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.6rem;
-  background: rgba(212,168,67,0.2);
-  border: 1px solid var(--gold-bright);
-  border-radius: 4px;
-  font-family: 'Cinzel', serif;
-  font-size: 0.65rem;
-  color: var(--gold-bright);
-}
-
-.admin-indicator::before {
-  content: '⚡';
-}
-
-/* Delete button styling */
 .delete-btn {
   margin-left: auto;
   color: #e57373 !important;
@@ -954,7 +889,14 @@ nav {
 .delete-btn:hover {
   background: #e57373 !important;
   color: var(--brown-deepest) !important;
-  box-shadow: 0 0 15px rgba(229,115,115,0.4);
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #e57373;
+  background: rgba(229,115,115, 0.1);
+  border: 1px solid rgba(229,115,115, 0.3);
 }
 
 /* ========== RESPONSIVE ========== */
