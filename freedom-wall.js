@@ -32,39 +32,115 @@ function hasUserReacted(postId, reaction) {
   return reactions[postId] && reactions[postId][reaction];
 }
 
-// Convert any music link to embed URL
-function getMusicEmbedUrl(inputUrl) {
-  if (!inputUrl) return null;
+// Selected music data
+var selectedMusic = null;
+
+// iTunes Search
+function searchMusic(query) {
+  var resultsEl = document.getElementById('musicResults');
+  if (!query || query.length < 2) {
+    resultsEl.classList.remove('show');
+    return;
+  }
   
-  // YouTube
-  if (inputUrl.includes('youtube.com') || inputUrl.includes('youtu.be')) {
-    var videoId = '';
-    if (inputUrl.includes('youtu.be')) {
-      videoId = inputUrl.split('/').pop().split('?')[0];
-    } else {
-      var params = new URLSearchParams(inputUrl.split('?')[1]);
-      videoId = params.get('v');
+  resultsEl.innerHTML = '<div class="music-result-empty">🔍 Searching...</div>';
+  resultsEl.classList.add('show');
+  
+  var cbName = 'itcb_' + Date.now();
+  window[cbName] = function(data) {
+    var tracks = (data.results || []).filter(function(t) { return t.previewUrl; });
+    delete window[cbName];
+    
+    if (tracks.length === 0) {
+      resultsEl.innerHTML = '<div class="music-result-empty">No songs found</div>';
+      return;
     }
-    return 'https://www.youtube.com/embed/' + videoId + '?start=0&autoplay=0';
-  }
+    
+    resultsEl.innerHTML = '';
+    tracks.slice(0, 8).forEach(function(t, i) {
+      var el = document.createElement('div');
+      el.className = 'music-result-item';
+      el.innerHTML = 
+        '<img class="result-art" src="' + (t.artworkUrl60 || t.artworkUrl100) + '" alt="">' +
+        '<div class="result-info">' +
+          '<div class="result-title">' + (t.trackName || t.collectionName) + '</div>' +
+          '<div class="result-artist">' + t.artistName + '</div>' +
+        '</div>';
+      el.addEventListener('click', function() {
+        selectMusic({
+          name: t.trackName || t.collectionName,
+          artist: t.artistName,
+          previewUrl: t.previewUrl,
+          artworkUrl: t.artworkUrl100
+        });
+        resultsEl.classList.remove('show');
+      });
+      resultsEl.appendChild(el);
+    });
+  };
   
-  // SoundCloud
-  if (inputUrl.includes('soundcloud.com')) {
-    return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(inputUrl) + '&color=%23d4a843&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false';
-  }
+  var script = document.createElement('script');
+  script.src = 'https://itunes.apple.com/search?term=' + encodeURIComponent(query) + '&media=music&entity=song&limit=10&callback=' + cbName;
+  script.onerror = function() {
+    resultsEl.innerHTML = '<div class="music-result-empty">Search failed</div>';
+  };
+  document.head.appendChild(script);
+}
+
+function selectMusic(music) {
+  selectedMusic = music;
+  document.getElementById('selectedArt').src = music.artworkUrl;
+  document.getElementById('selectedTitle').textContent = music.name;
+  document.getElementById('selectedArtist').textContent = music.artist;
+  document.getElementById('musicSelected').style.display = 'flex';
+  document.getElementById('musicSearchInput').value = '';
+  document.getElementById('musicResults').classList.remove('show');
+}
+
+function clearSelectedMusic() {
+  selectedMusic = null;
+  document.getElementById('musicSelected').style.display = 'none';
+  document.getElementById('selectedArt').src = '';
+  document.getElementById('selectedTitle').textContent = '';
+  document.getElementById('selectedArtist').textContent = '';
+}
+
+// Set up music search listeners
+var musicSearchInput = document.getElementById('musicSearchInput');
+var musicSearchTimer = null;
+if (musicSearchInput) {
+  musicSearchInput.addEventListener('input', function() {
+    clearTimeout(musicSearchTimer);
+    musicSearchTimer = setTimeout(function() {
+      searchMusic(musicSearchInput.value.trim());
+    }, 400);
+  });
   
-  // Spotify
-  if (inputUrl.includes('spotify.com')) {
-    var trackId = inputUrl.split('/').pop().split('?')[0];
-    return 'https://open.spotify.com/embed/track/' + trackId + '?theme=0';
-  }
-  
-  // Direct audio file
-  if (inputUrl.match(/\.(mp3|wav|ogg)$/i)) {
-    return inputUrl;
-  }
-  
-  return null;
+  // Close results when clicking outside
+  document.addEventListener('click', function(e) {
+    var resultsEl = document.getElementById('musicResults');
+    if (!e.target.closest('.music-search-section')) {
+      resultsEl.classList.remove('show');
+    }
+  });
+}
+
+// Remove music button
+var removeMusicBtn = document.getElementById('removeMusicBtn');
+if (removeMusicBtn) {
+  removeMusicBtn.addEventListener('click', clearSelectedMusic);
+}
+
+// Get music embed player (iTunes has 30s preview, just use audio player)
+function getMusicPlayerHtml(music) {
+  if (!music || !music.previewUrl) return '';
+  return '<div class="post-music">' +
+    '<div class="music-info">' +
+      '<img src="' + (music.artworkUrl || '') + '" alt="">' +
+      '<div><strong>' + (music.name || '') + '</strong><span>' + (music.artist || '') + '</span></div>' +
+    '</div>' +
+    '<audio controls src="' + music.previewUrl + '"></audio>' +
+  '</div>';
 }
 
 function formatTime(timestamp) {
@@ -96,19 +172,11 @@ function createPostElement(post, postId) {
   article.dataset.id = postId;
 
   var authorDisplay = post.authorName || 'Anonymous';
-  var userHasLiked = hasUserReacted(postId, 'like');
 
-  // Music player
+  // Music player from iTunes
   var musicPlayerHtml = '';
-  if (post.musicUrl) {
-    var embedUrl = getMusicEmbedUrl(post.musicUrl);
-    if (embedUrl) {
-      musicPlayerHtml = '<div class="post-music">' +
-        '<iframe src="' + embedUrl + '" ' +
-        'width="100%" height="80" frameborder="0" ' +
-        'allow="autoplay; encrypted-media" allowfullscreen></iframe>' +
-      '</div>';
-    }
+  if (post.musicData) {
+    musicPlayerHtml = getMusicPlayerHtml(post.musicData);
   }
 
   var commentsHtml = '';
@@ -303,7 +371,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
   });
 });
 
-// Form submission
+// Form submission - NOW WITH ITUNES MUSIC
 var postForm = document.getElementById('postForm');
 postForm.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -311,45 +379,12 @@ postForm.addEventListener('submit', function(e) {
   var submitBtn = document.getElementById('submitBtn');
   var authorName = document.getElementById('authorName').value.trim();
   var content = document.getElementById('postContent').value.trim();
-  var musicLink = document.getElementById('musicLink').value.trim();
 
   if (!content) return;
 
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span>Posting...</span>';
 
-  postsRef.push({
-    authorName: authorName || null,
-    content: content,
-    musicUrl: musicLink || null,
-    timestamp: Date.now(),
-    reactions: {},
-    comments: []
-  }).then(function() {
-    document.getElementById('authorName').value = '';
-    document.getElementById('postContent').value = '';
-    document.getElementById('musicLink').value = '';
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<span>Post to Wall</span>';
-  }).catch(function(error) {
-    alert('Failed to post.');
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<span>Post to Wall</span>';
-  });
-});
-
-// Mobile menu
-var hamburger = document.getElementById('hamburger');
-var mobileMenu = document.getElementById('mobileMenu');
-if (hamburger && mobileMenu) {
-  hamburger.addEventListener('click', function() {
-    var isOpen = mobileMenu.classList.toggle('open');
-    hamburger.setAttribute('aria-expanded', isOpen);
-  });
-  mobileMenu.querySelectorAll('a').forEach(function(link) {
-    link.addEventListener('click', function() {
-      mobileMenu.classList.remove('open');
-      hamburger.setAttribute('aria-expanded', 'false');
-    });
-  });
-}
+  // Include selected music data from iTunes
+  var postData = {
+    authorName: authorName ||
