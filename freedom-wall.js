@@ -89,20 +89,28 @@ function searchMusic(query) {
 
 function selectMusic(music) {
   selectedMusic = music;
-  document.getElementById('selectedArt').src = music.artworkUrl;
-  document.getElementById('selectedTitle').textContent = music.name;
-  document.getElementById('selectedArtist').textContent = music.artist;
-  document.getElementById('musicSelected').style.display = 'flex';
-  document.getElementById('musicSearchInput').value = '';
-  document.getElementById('musicResults').classList.remove('show');
+  var selectedArt = document.getElementById('selectedArt');
+  var selectedTitle = document.getElementById('selectedTitle');
+  var selectedArtist = document.getElementById('selectedArtist');
+  var musicSelected = document.getElementById('musicSelected');
+  
+  if (selectedArt) selectedArt.src = music.artworkUrl;
+  if (selectedTitle) selectedTitle.textContent = music.name;
+  if (selectedArtist) selectedArtist.textContent = music.artist;
+  if (musicSelected) musicSelected.style.display = 'flex';
+  
+  if (document.getElementById('musicSearchInput')) {
+    document.getElementById('musicSearchInput').value = '';
+  }
+  if (document.getElementById('musicResults')) {
+    document.getElementById('musicResults').classList.remove('show');
+  }
 }
 
 function clearSelectedMusic() {
   selectedMusic = null;
-  document.getElementById('musicSelected').style.display = 'none';
-  document.getElementById('selectedArt').src = '';
-  document.getElementById('selectedTitle').textContent = '';
-  document.getElementById('selectedArtist').textContent = '';
+  var musicSelected = document.getElementById('musicSelected');
+  if (musicSelected) musicSelected.style.display = 'none';
 }
 
 // Set up music search listeners
@@ -116,22 +124,20 @@ if (musicSearchInput) {
     }, 400);
   });
   
-  // Close results when clicking outside
   document.addEventListener('click', function(e) {
     var resultsEl = document.getElementById('musicResults');
-    if (!e.target.closest('.music-search-section')) {
+    if (resultsEl && !e.target.closest('.music-search-section')) {
       resultsEl.classList.remove('show');
     }
   });
 }
 
-// Remove music button
 var removeMusicBtn = document.getElementById('removeMusicBtn');
 if (removeMusicBtn) {
   removeMusicBtn.addEventListener('click', clearSelectedMusic);
 }
 
-// Get music embed player (iTunes has 30s preview, just use audio player)
+// Get music player HTML
 function getMusicPlayerHtml(music) {
   if (!music || !music.previewUrl) return '';
   return '<div class="post-music">' +
@@ -172,12 +178,7 @@ function createPostElement(post, postId) {
   article.dataset.id = postId;
 
   var authorDisplay = post.authorName || 'Anonymous';
-
-  // Music player from iTunes
-  var musicPlayerHtml = '';
-  if (post.musicData) {
-    musicPlayerHtml = getMusicPlayerHtml(post.musicData);
-  }
+  var musicPlayerHtml = post.musicData ? getMusicPlayerHtml(post.musicData) : '';
 
   var commentsHtml = '';
   if (post.comments && post.comments.length > 0) {
@@ -359,7 +360,10 @@ postsRef.on('value', function(snapshot) {
   var activeFilter = document.querySelector('.filter-btn.active');
   renderPosts(postsData, activeFilter ? activeFilter.dataset.filter : 'all');
 }, function(error) {
-  document.getElementById('postsContainer').innerHTML = '<div class="error-message">Error loading posts.</div>';
+  var container = document.getElementById('postsContainer');
+  if (container) {
+    container.innerHTML = '<div class="error-message">Error loading posts.</div>';
+  }
 });
 
 // Filter buttons
@@ -371,7 +375,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
   });
 });
 
-// Form submission - NOW WITH ITUNES MUSIC
+// Form submission - with iTunes music
 var postForm = document.getElementById('postForm');
 postForm.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -385,6 +389,56 @@ postForm.addEventListener('submit', function(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span>Posting...</span>';
 
-  // Include selected music data from iTunes
+  // Post data with iTunes music
   var postData = {
-    authorName: authorName ||
+    authorName: authorName || null,
+    content: content,
+    timestamp: Date.now(),
+    reactions: {},
+    comments: []
+  };
+
+  // Add music if selected
+  if (selectedMusic) {
+    postData.musicData = selectedMusic;
+  }
+
+  postsRef.push(postData).then(function() {
+    var authorNameEl = document.getElementById('authorName');
+    var postContentEl = document.getElementById('postContent');
+    
+    if (authorNameEl) authorNameEl.value = '';
+    if (postContentEl) postContentEl.value = '';
+    
+    // Clear music selection
+    clearSelectedMusic();
+    
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Post to Wall</span>';
+    }
+  }).catch(function(error) {
+    console.error('Error posting:', error);
+    alert('Failed to post. Please try again.');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Post to Wall</span>';
+    }
+  });
+});
+
+// Mobile menu toggle
+var hamburger = document.getElementById('hamburger');
+var mobileMenu = document.getElementById('mobileMenu');
+if (hamburger && mobileMenu) {
+  hamburger.addEventListener('click', function() {
+    var isOpen = mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+  mobileMenu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      mobileMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
