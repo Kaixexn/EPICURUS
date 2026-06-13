@@ -122,6 +122,16 @@ nav {
   text-shadow: 0 0 8px rgba(240, 204, 114, 0.5);
 }
 
+.gallery-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 1rem 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .nav-links a:hover::after, .nav-links a.active::after { width: 60%; }
 
 .hamburger {
