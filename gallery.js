@@ -12,7 +12,8 @@ const firebaseConfig = {
   measurementId: "G-5J2C56NQL4"
 };
 
-const IMGBB_API_KEY = "c21af3a036d8272c19c7e7f1ae15df6b1";
+const CLOUDINARY_CLOUD_NAME = "dpses7bp6";
+const CLOUDINARY_UPLOAD_PRESET = "epicurus_gallery";
 
 initializeApp(firebaseConfig);
 const db = getDatabase();
@@ -34,18 +35,30 @@ function getPhotosRef() {
 
 async function uploadImage(file) {
   const formData = new FormData();
-  formData.append('image', file);
-  formData.append('key', IMGBB_API_KEY);
-  
-  const response = await fetch('https://api.imgbb.com/1/upload', {
-    method: 'POST',
-    body: formData
-  });
-  
-  if (!response.ok) throw new Error('Upload failed');
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: 'POST',
+      body: formData
+    }
+  );
+
+  if (!response.ok) {
+    const errData = await response.json();
+    throw new Error(errData.error?.message || 'Upload failed');
+  }
+
   const data = await response.json();
-  if (!data.success) throw new Error(data.error.message);
-  return data.data;
+
+  return {
+    url: data.secure_url,
+    thumb: {
+      url: data.secure_url.replace('/upload/', '/upload/w_400,q_auto,f_auto/')
+    }
+  };
 }
 
 function loadGallery(filter = 'all') {
@@ -77,7 +90,7 @@ function loadGallery(filter = 'all') {
       item.className = 'gallery-item';
       item.dataset.index = index;
       item.innerHTML = `
-        <img src="${photo.imageUrl}" alt="${photo.caption || ''}">
+        <img src="${photo.thumbnailUrl || photo.imageUrl}" alt="${photo.caption || ''}">
         <div class="gallery-item-overlay">
           <p class="gallery-item-caption">${photo.caption || ''}</p>
           <p class="gallery-item-date">${photo.eventDate || ''}</p>
@@ -159,14 +172,15 @@ function toggleHeart() {
   const photo = allPhotos[currentPhotoIndex];
   const key = `heart_${photo.id}`;
   const hasHearted = localStorage.getItem(key) === 'true';
-  
-  if (hasHearted) {
-    localStorage.setItem(key, 'false');
-    update(ref(db, `gallery/${photo.id}/hearts`), { hearts: Math.max(0, (photo.hearts || 1) - 1) });
-  } else {
-    localStorage.setItem(key, 'true');
-    update(ref(db, `gallery/${photo.id}/hearts`), { hearts: (photo.hearts || 0) + 1 });
-  }
+  const newCount = hasHearted
+    ? Math.max(0, (photo.hearts || 1) - 1)
+    : (photo.hearts || 0) + 1;
+
+  localStorage.setItem(key, hasHearted ? 'false' : 'true');
+  update(ref(db, `gallery/${photo.id}`), { hearts: newCount });
+
+  document.getElementById('lbHeartCount').textContent = newCount;
+  document.getElementById('lbHeartBtn').classList.toggle('loved', !hasHearted);
 }
 
 function loadComments(photoId) {
@@ -292,11 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const status = document.getElementById('uploadStatus');
     status.textContent = 'Uploading...';
-    
+
     try {
       const result = await uploadImage(window.pendingFile);
       
-      push(getPhotosRef(), {
+      await push(getPhotosRef(), {
         imageUrl: result.url,
         thumbnailUrl: result.thumb.url,
         caption,
@@ -311,7 +325,12 @@ document.addEventListener('DOMContentLoaded', () => {
       status.textContent = '';
       window.pendingFile = null;
       document.getElementById('uploadPreviewWrap').classList.remove('show');
+      document.getElementById('uploadCaption').value = '';
+      document.getElementById('uploadDate').value = '';
+      document.getElementById('uploadLocation').value = '';
+      document.getElementById('uploadTags').value = '';
     } catch (err) {
+      console.error('Upload error:', err);
       showToast('Upload failed: ' + err.message, true);
       status.textContent = '';
     }
