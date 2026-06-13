@@ -118,12 +118,19 @@ function renderFilterButtons() {
   });
 }
 
+let filtersInitialized = false;
+
 function initGallery() {
   onValue(getPhotosRef(), (snapshot) => {
     const data = snapshot.val();
     allPhotos = data ? Object.entries(data).map(([id, photo]) => ({ id, ...photo })) : [];
     allPhotos.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    renderFilterButtons();
+
+    if (!filtersInitialized) {
+      renderFilterButtons();
+      filtersInitialized = true;
+    }
+
     renderGallery();
   });
 }
