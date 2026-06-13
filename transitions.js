@@ -108,5 +108,5 @@ document.addEventListener('click', (e) => {
 
   setTimeout(() => {
     window.location.href = href;
-  }, 4500);
+  }, 1500);
 });
