@@ -21,6 +21,7 @@ const db = getDatabase();
 let isAdmin = localStorage.getItem('epicurus_admin') === 'true';
 let allPhotos = [];
 let currentPhotoIndex = 0;
+let activeFilter = 'all';
 
 function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
@@ -57,70 +58,73 @@ async function uploadImage(file) {
   };
 }
 
-function loadGallery(filter = 'all') {
+function renderGallery() {
   const grid = document.getElementById('galleryGrid');
   const empty = document.getElementById('galleryEmpty');
 
-  onValue(getPhotosRef(), (snapshot) => {
-    const data = snapshot.val();
-    allPhotos = data ? Object.entries(data).map(([id, photo]) => ({ id, ...photo })) : [];
-    allPhotos.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  const filtered = activeFilter === 'all'
+    ? allPhotos
+    : allPhotos.filter(p => p.tags && p.tags.includes(activeFilter));
 
-    const filtered = filter === 'all'
-      ? allPhotos
-      : allPhotos.filter(p => p.tags && p.tags.includes(filter));
+  grid.innerHTML = '';
 
-    grid.innerHTML = '';
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    grid.appendChild(empty);
+    return;
+  }
 
-    if (filtered.length === 0) {
-      empty.style.display = 'block';
-      grid.appendChild(empty);
-      return;
-    }
+  empty.style.display = 'none';
 
-    empty.style.display = 'none';
-
-    filtered.forEach((photo, index) => {
-      const item = document.createElement('div');
-      item.className = 'gallery-item';
-      item.dataset.index = index;
-      item.innerHTML = `
-        <img src="${photo.thumbnailUrl || photo.imageUrl}" alt="${photo.caption || ''}">
-        <div class="gallery-item-overlay">
-          <p class="gallery-item-caption">${photo.caption || ''}</p>
-          <p class="gallery-item-date">${photo.eventDate || ''}</p>
-        </div>
-        <span class="gallery-item-heart">♥ ${photo.hearts || 0}</span>
-      `;
-      item.addEventListener('click', () => openLightbox(index));
-      grid.appendChild(item);
-    });
-
-    renderFilterButtons(data);
+  filtered.forEach((photo, index) => {
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.dataset.index = index;
+    item.innerHTML = `
+      <img src="${photo.thumbnailUrl || photo.imageUrl}" alt="${photo.caption || ''}">
+      <div class="gallery-item-overlay">
+        <p class="gallery-item-caption">${photo.caption || ''}</p>
+        <p class="gallery-item-date">${photo.eventDate || ''}</p>
+      </div>
+      <span class="gallery-item-heart">♥ ${photo.hearts || 0}</span>
+    `;
+    item.addEventListener('click', () => openLightbox(index));
+    grid.appendChild(item);
   });
 }
 
-function renderFilterButtons(data) {
+function renderFilterButtons() {
   const nav = document.getElementById('galleryNav');
   const tags = new Set();
 
-  Object.values(data || {}).forEach(photo => {
+  allPhotos.forEach(photo => {
     (photo.tags || []).forEach(tag => tags.add(tag));
   });
 
   nav.innerHTML = `
-    <button class="gallery-filter active" data-filter="all">All Memories</button>
+    <button class="gallery-filter ${activeFilter === 'all' ? 'active' : ''}" data-filter="all">All Memories</button>
     ${Array.from(tags).map(tag => `
-      <button class="gallery-filter" data-filter="${tag}">${tag}</button>
+      <button class="gallery-filter ${activeFilter === tag ? 'active' : ''}" data-filter="${tag}">${tag}</button>
     `).join('')}
   `;
 
   nav.querySelectorAll('.gallery-filter').forEach(btn => {
     btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.filter;
       nav.querySelectorAll('.gallery-filter').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      loadGallery(btn.dataset.filter);
+      renderGallery();
     });
+  });
+}
+
+function initGallery() {
+  onValue(getPhotosRef(), (snapshot) => {
+    const data = snapshot.val();
+    allPhotos = data ? Object.entries(data).map(([id, photo]) => ({ id, ...photo })) : [];
+    allPhotos.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    renderFilterButtons();
+    renderGallery();
   });
 }
 
@@ -228,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adminUploadPanel').classList.add('show');
   }
 
-  loadGallery();
+  initGallery();
 
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
