@@ -40,14 +40,10 @@ async function uploadImage(file) {
 
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-    {
-      method: 'POST',
-      body: formData
-    }
+    { method: 'POST', body: formData }
   );
 
   const data = await response.json();
-  console.log('Cloudinary response:', data);
 
   if (!response.ok || data.error) {
     throw new Error(data.error?.message || 'Upload failed');
@@ -154,7 +150,6 @@ function openLightbox(index) {
   heartBtn.classList.toggle('loved', localStorage.getItem(`heart_${photo.id}`) === 'true');
 
   loadComments(photo.id);
-
   lightbox.classList.add('show');
 }
 
@@ -235,13 +230,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadGallery();
 
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  hamburger?.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+
+  mobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
   document.getElementById('adminToggleBtn')?.addEventListener('click', () => {
     document.getElementById('adminModal').classList.add('show');
   });
 
   document.getElementById('adminToggleBtnMobile')?.addEventListener('click', () => {
     document.getElementById('adminModal').classList.add('show');
-    document.getElementById('mobileMenu').classList.remove('open');
+    mobileMenu.classList.remove('open');
   });
 
   document.getElementById('modalClose').addEventListener('click', () => {
@@ -265,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
- 
   document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
     localStorage.removeItem('epicurus_admin');
     isAdmin = false;
