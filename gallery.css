@@ -820,6 +820,35 @@ nav {
   background: transparent;
 }
 
+.admin-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.admin-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid #8b2a2a;
+  color: #c0392b;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.admin-logout-btn:hover {
+  background: #8b2a2a;
+  color: #fff;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
   .lightbox-content {
