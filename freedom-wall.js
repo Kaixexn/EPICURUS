@@ -12,7 +12,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 
-/* ========== REACTION & ADMIN STORAGE ========== */
 function getUserReactions() {
   var reactions = localStorage.getItem('epicurus_reactions');
   return reactions ? JSON.parse(reactions) : {};
@@ -52,7 +51,6 @@ function updateAdminUI() {
   }
 }
 
-/* ========== ITUNES MUSIC SEARCH (FIXED MEMORY LEAK) ========== */
 var selectedMusic = null;
 var currentPreviewAudio = null;
 var currentPreviewBtn = null;
@@ -73,7 +71,6 @@ function searchMusic(query) {
     var tracks = (data.results || []).filter(function(t) { return t.previewUrl; });
     delete window[cbName];
     
-    // Clean up script element from document head immediately
     var scriptToKill = document.getElementById(cbName);
     if (scriptToKill) scriptToKill.remove();
     
@@ -187,7 +184,6 @@ function clearSelectedMusic() {
   document.getElementById('selectedArt').src = '';
 }
 
-/* ========== INPUT EVENT HANDLING ========== */
 var musicSearchInput = document.getElementById('musicSearchInput');
 var musicSearchTimer = null;
 if (musicSearchInput) {
@@ -211,7 +207,6 @@ if (removeMusicBtn) {
   removeMusicBtn.addEventListener('click', clearSelectedMusic);
 }
 
-/* ========== RENDERING GENERATION (SYNCHRONIZED STRINGS) ========== */
 function getMusicPlayerHtml(music) {
   if (!music || !music.previewUrl) return '';
   return '<div class="post-music">' +
@@ -268,7 +263,6 @@ function createPostElement(post, postId, savedStates) {
     }).join('');
   }
 
-  // Checked state caches to preserve interaction continuity
   var isCommentsOpen = savedStates && savedStates[postId] && savedStates[postId].open ? ' show' : '';
   var currentDraftValue = savedStates && savedStates[postId] ? savedStates[postId].text || '' : '';
 
@@ -318,12 +312,10 @@ function createPostElement(post, postId, savedStates) {
   return article;
 }
 
-/* ========== STATE RETENTION DATA PASSING (FIXED UI RESET) ========== */
 function renderPosts(postsData, filter) {
   var container = document.getElementById('postsContainer');
   if (!container) return;
 
-  // Stash active user writing state and toggled view parameters before clearing out DOM
   var savedStates = {};
   container.querySelectorAll('.comment-section').forEach(function(section) {
     var pId = section.id.replace('comments-', '');
@@ -443,7 +435,6 @@ function renderPostsByFilter() {
   });
 }
 
-/* ========== FIREBASE STREAM EVENT HOOK ========== */
 var postsRef = db.ref('posts');
 postsRef.on('value', function(snapshot) {
   var postsData = snapshot.val();
@@ -541,7 +532,6 @@ if (hamburger && mobileMenu) {
   });
 }
 
-/* ========== CUSTOM THEMED MODAL INJECTION & INTERACTION ========== */
 document.body.insertAdjacentHTML('beforeend', `
   <div class="admin-modal-overlay" id="adminModalOverlay">
     <div class="admin-modal">
@@ -605,5 +595,4 @@ if (adminLogoutBtn) {
   });
 }
 
-// Global System Boot Validation Pass Run
 updateAdminUI();
