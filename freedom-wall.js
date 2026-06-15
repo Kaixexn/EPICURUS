@@ -573,5 +573,25 @@ if (adminLogoutBtn) {
   });
 }
 
+const postHTML = `
+  <div class="post-card">
+    <!-- ... author header and post contents above ... -->
+    
+    <div class="post-actions">
+       <!-- Reaction buttons here -->
+    </div>
+
+    <!-- The Styled Comment Area Interface -->
+    <div class="comment-section">
+      <button class="view-comments-toggle">View comments (0)</button>
+      
+      <div class="comment-form-row">
+        <textarea class="comment-input" placeholder="Write an anonymous comment..."></textarea>
+        <button class="comment-submit-btn">Post</button>
+      </div>
+    </div>
+  </div>
+`;
+
 // Initialization validation pass on page boot
 updateAdminUI();
