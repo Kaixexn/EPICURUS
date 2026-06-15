@@ -20,8 +20,10 @@ const db = getDatabase();
 
 let isAdmin = localStorage.getItem('epicurus_admin') === 'true';
 let allPhotos = [];
+let filteredPhotos = [];
 let currentPhotoIndex = 0;
 let activeFilter = 'all';
+let activeCommentsListener = null;
 
 function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
@@ -62,13 +64,13 @@ function renderGallery() {
   const grid = document.getElementById('galleryGrid');
   const empty = document.getElementById('galleryEmpty');
 
-  const filtered = activeFilter === 'all'
+  filteredPhotos = activeFilter === 'all'
     ? allPhotos
     : allPhotos.filter(p => p.tags && p.tags.includes(activeFilter));
 
   grid.innerHTML = '';
 
-  if (filtered.length === 0) {
+  if (filteredPhotos.length === 0) {
     empty.style.display = 'block';
     grid.appendChild(empty);
     return;
@@ -76,7 +78,7 @@ function renderGallery() {
 
   empty.style.display = 'none';
 
-  filtered.forEach((photo, index) => {
+  filteredPhotos.forEach((photo, index) => {
     const item = document.createElement('div');
     item.className = 'gallery-item';
     item.dataset.index = index;
@@ -137,7 +139,9 @@ function initGallery() {
 
 function openLightbox(index) {
   currentPhotoIndex = index;
-  const photo = allPhotos[index];
+  const photo = filteredPhotos[index];
+  if (!photo) return;
+  
   const lightbox = document.getElementById('lightbox');
 
   document.getElementById('lightboxImg').src = photo.imageUrl;
@@ -165,16 +169,23 @@ function openLightbox(index) {
 }
 
 function closeLightbox() {
+  if (activeCommentsListener) {
+    activeCommentsListener();
+    activeCommentsListener = null;
+  }
   document.getElementById('lightbox').classList.remove('show');
 }
 
 function navigateLightbox(direction) {
-  currentPhotoIndex = (currentPhotoIndex + direction + allPhotos.length) % allPhotos.length;
+  if (filteredPhotos.length === 0) return;
+  currentPhotoIndex = (currentPhotoIndex + direction + filteredPhotos.length) % filteredPhotos.length;
   openLightbox(currentPhotoIndex);
 }
 
 function toggleHeart() {
-  const photo = allPhotos[currentPhotoIndex];
+  const photo = filteredPhotos[currentPhotoIndex];
+  if (!photo) return;
+  
   const key = `heart_${photo.id}`;
   const hasHearted = localStorage.getItem(key) === 'true';
   const newCount = hasHearted
@@ -189,9 +200,13 @@ function toggleHeart() {
 }
 
 function loadComments(photoId) {
+  if (activeCommentsListener) {
+    activeCommentsListener();
+  }
+  
   const list = document.getElementById('lbCommentsList');
 
-  onValue(ref(db, `gallery/${photoId}/comments`), (snapshot) => {
+  activeCommentsListener = onValue(ref(db, `gallery/${photoId}/comments`), (snapshot) => {
     const comments = snapshot.val() ? Object.values(snapshot.val()) : [];
     list.innerHTML = comments.map(c => `
       <div class="lb-comment">
@@ -207,7 +222,9 @@ function addComment() {
   const text = input.value.trim();
   if (!text) return;
 
-  const photo = allPhotos[currentPhotoIndex];
+  const photo = filteredPhotos[currentPhotoIndex];
+  if (!photo) return;
+  
   push(ref(db, `gallery/${photo.id}/comments`), {
     text,
     timestamp: Date.now()
@@ -217,7 +234,9 @@ function addComment() {
 }
 
 function savePhotoEdits() {
-  const photo = allPhotos[currentPhotoIndex];
+  const photo = filteredPhotos[currentPhotoIndex];
+  if (!photo) return;
+  
   update(ref(db, `gallery/${photo.id}`), {
     caption: document.getElementById('lbEditCaption').value,
     location: document.getElementById('lbEditLocation').value
@@ -226,7 +245,9 @@ function savePhotoEdits() {
 }
 
 function deletePhoto() {
-  const photo = allPhotos[currentPhotoIndex];
+  const photo = filteredPhotos[currentPhotoIndex];
+  if (!photo) return;
+  
   if (confirm('Delete this memory?')) {
     remove(ref(db, `gallery/${photo.id}`));
     closeLightbox();
