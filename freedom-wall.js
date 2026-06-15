@@ -12,6 +12,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 
+/* ========== REACTION & ADMIN STORAGE ========== */
 function getUserReactions() {
   var reactions = localStorage.getItem('epicurus_reactions');
   return reactions ? JSON.parse(reactions) : {};
@@ -51,6 +52,7 @@ function updateAdminUI() {
   }
 }
 
+/* ========== ITUNES MUSIC SEARCH (FIXED MEMORY LEAK) ========== */
 var selectedMusic = null;
 var currentPreviewAudio = null;
 var currentPreviewBtn = null;
@@ -66,9 +68,14 @@ function searchMusic(query) {
   resultsEl.classList.add('show');
   
   var cbName = 'itcb_' + Date.now();
+  
   window[cbName] = function(data) {
     var tracks = (data.results || []).filter(function(t) { return t.previewUrl; });
     delete window[cbName];
+    
+    // Clean up script element from document head immediately
+    var scriptToKill = document.getElementById(cbName);
+    if (scriptToKill) scriptToKill.remove();
     
     if (tracks.length === 0) {
       resultsEl.innerHTML = '<div class="music-result-empty">No songs found</div>';
@@ -106,9 +113,12 @@ function searchMusic(query) {
   };
   
   var script = document.createElement('script');
+  script.id = cbName;
   script.src = 'https://itunes.apple.com/search?term=' + encodeURIComponent(query) + '&media=music&entity=song&limit=10&callback=' + cbName;
   script.onerror = function() {
     resultsEl.innerHTML = '<div class="music-result-empty">Search failed</div>';
+    delete window[cbName];
+    script.remove();
   };
   document.head.appendChild(script);
 }
@@ -177,6 +187,7 @@ function clearSelectedMusic() {
   document.getElementById('selectedArt').src = '';
 }
 
+/* ========== INPUT EVENT HANDLING ========== */
 var musicSearchInput = document.getElementById('musicSearchInput');
 var musicSearchTimer = null;
 if (musicSearchInput) {
@@ -200,6 +211,7 @@ if (removeMusicBtn) {
   removeMusicBtn.addEventListener('click', clearSelectedMusic);
 }
 
+/* ========== RENDERING GENERATION (SYNCHRONIZED STRINGS) ========== */
 function getMusicPlayerHtml(music) {
   if (!music || !music.previewUrl) return '';
   return '<div class="post-music">' +
@@ -233,7 +245,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function createPostElement(post, postId) {
+function createPostElement(post, postId, savedStates) {
   var article = document.createElement('article');
   article.className = 'post-card';
   article.dataset.author = post.authorName ? 'named' : 'anonymous';
@@ -255,6 +267,10 @@ function createPostElement(post, postId) {
       '</div>';
     }).join('');
   }
+
+  // Checked state caches to preserve interaction continuity
+  var isCommentsOpen = savedStates && savedStates[postId] && savedStates[postId].open ? ' show' : '';
+  var currentDraftValue = savedStates && savedStates[postId] ? savedStates[postId].text || '' : '';
 
   article.innerHTML = 
     '<div class="post-header">' +
@@ -286,13 +302,15 @@ function createPostElement(post, postId) {
       '</button>' +
       deleteBtnHtml +
     '</div>' +
-    '<div class="comments-section" id="comments-' + postId + '">' +
-      '<button class="comments-toggle" data-target="comments-' + postId + '">' +
+    '<div class="comment-section' + isCommentsOpen + '" id="comments-' + postId + '">' +
+      '<button class="view-comments-toggle" data-target="comments-' + postId + '">' +
         'View comments (' + (post.comments ? post.comments.length : 0) + ')' +
       '</button>' +
       '<form class="comment-form" data-post-id="' + postId + '">' +
-        '<input type="text" class="comment-input" placeholder="Write an anonymous comment..." required>' +
-        '<button type="submit" class="comment-submit">Post</button>' +
+        '<div class="comment-form-row">' +
+          '<textarea class="comment-input" placeholder="Write an anonymous comment..." required>' + escapeHtml(currentDraftValue) + '</textarea>' +
+          '<button type="submit" class="comment-submit-btn">Post</button>' +
+        '</div>' +
       '</form>' +
       '<div class="comments-list">' + commentsHtml + '</div>' +
     '</div>';
@@ -300,9 +318,22 @@ function createPostElement(post, postId) {
   return article;
 }
 
+/* ========== STATE RETENTION DATA PASSING (FIXED UI RESET) ========== */
 function renderPosts(postsData, filter) {
   var container = document.getElementById('postsContainer');
   if (!container) return;
+
+  // Stash active user writing state and toggled view parameters before clearing out DOM
+  var savedStates = {};
+  container.querySelectorAll('.comment-section').forEach(function(section) {
+    var pId = section.id.replace('comments-', '');
+    var txtArea = section.querySelector('.comment-input');
+    savedStates[pId] = {
+      open: section.classList.contains('show'),
+      text: txtArea ? txtArea.value : ''
+    };
+  });
+
   container.innerHTML = '';
 
   var posts = [];
@@ -329,7 +360,7 @@ function renderPosts(postsData, filter) {
   });
 
   filteredPosts.forEach(function(post) {
-    container.appendChild(createPostElement(post.data, post.id));
+    container.appendChild(createPostElement(post.data, post.id, savedStates));
   });
 
   attachPostEventListeners();
@@ -363,7 +394,7 @@ function attachPostEventListeners() {
     });
   });
 
-  document.querySelectorAll('.comments-toggle').forEach(function(btn) {
+  document.querySelectorAll('.view-comments-toggle').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var target = this.dataset.target;
       var section = document.getElementById(target);
@@ -412,6 +443,7 @@ function renderPostsByFilter() {
   });
 }
 
+/* ========== FIREBASE STREAM EVENT HOOK ========== */
 var postsRef = db.ref('posts');
 postsRef.on('value', function(snapshot) {
   var postsData = snapshot.val();
@@ -573,25 +605,5 @@ if (adminLogoutBtn) {
   });
 }
 
-const postHTML = `
-  <div class="post-card">
-    <!-- ... author header and post contents above ... -->
-    
-    <div class="post-actions">
-       <!-- Reaction buttons here -->
-    </div>
-
-    <!-- The Styled Comment Area Interface -->
-    <div class="comment-section">
-      <button class="view-comments-toggle">View comments (0)</button>
-      
-      <div class="comment-form-row">
-        <textarea class="comment-input" placeholder="Write an anonymous comment..."></textarea>
-        <button class="comment-submit-btn">Post</button>
-      </div>
-    </div>
-  </div>
-`;
-
-// Initialization validation pass on page boot
+// Global System Boot Validation Pass Run
 updateAdminUI();
