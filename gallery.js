@@ -66,17 +66,16 @@ function renderGallery() {
 
   filteredPhotos = activeFilter === 'all'
     ? allPhotos
-    : allPhotos.filter(p => p.tags && p.tags.includes(activeFilter));
+    : allPhotos.filter(p => p.tags && p.tags.some(t => t.trim().toLowerCase() === activeFilter.trim().toLowerCase()));
 
   grid.innerHTML = '';
 
   if (filteredPhotos.length === 0) {
-    empty.style.display = 'block';
-    grid.appendChild(empty);
+    if (empty) empty.style.display = 'block';
     return;
   }
 
-  empty.style.display = 'none';
+  if (empty) empty.style.display = 'none';
 
   filteredPhotos.forEach((photo, index) => {
     const item = document.createElement('div');
@@ -97,16 +96,19 @@ function renderGallery() {
 
 function renderFilterButtons() {
   const nav = document.getElementById('galleryNav');
-  const tags = new Set();
+  if (!nav) return;
 
+  const tags = new Set();
   allPhotos.forEach(photo => {
-    (photo.tags || []).forEach(tag => tags.add(tag));
+    (photo.tags || []).forEach(tag => {
+      if (tag && tag.trim()) tags.add(tag.trim());
+    });
   });
 
   nav.innerHTML = `
     <button class="gallery-filter ${activeFilter === 'all' ? 'active' : ''}" data-filter="all">All Memories</button>
     ${Array.from(tags).map(tag => `
-      <button class="gallery-filter ${activeFilter === tag ? 'active' : ''}" data-filter="${tag}">${tag}</button>
+      <button class="gallery-filter ${activeFilter.toLowerCase() === tag.toLowerCase() ? 'active' : ''}" data-filter="${tag}">${tag}</button>
     `).join('')}
   `;
 
