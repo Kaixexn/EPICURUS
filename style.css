@@ -8,10 +8,22 @@
   --gold-bright:   #d4a843;
   --gold-light:    #f0cc72;
   --gold-pale:     #faeab0;
+  --gold-shimmer:  #f5e27a;   /* ① extra highlight stop */
   --gold-dark:     #9a7520;
+  --gold-deeper:   #7a5510;   /* ⑥ foil shadow stop */
   --cream:         #fdf6e3;
   --white:         #ffffff;
   --text-muted:    rgba(240,204,114,0.55);
+
+  /* ① Shimmer gradient — referenced in keyframe */
+  --shimmer-grad: linear-gradient(
+    100deg,
+    var(--gold-dark)    0%,
+    var(--gold-bright)  28%,
+    var(--gold-shimmer) 50%,
+    var(--gold-bright)  72%,
+    var(--gold-dark)    100%
+  );
 }
 
 html { scroll-behavior: smooth; }
@@ -24,6 +36,10 @@ body {
   overflow-x: hidden;
 }
 
+
+/* ─────────────────────────────────────────
+   NAV
+───────────────────────────────────────── */
 nav {
   position: sticky;
   top: 0;
@@ -47,7 +63,13 @@ nav {
   font-family: 'Cinzel', serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--gold-bright);
+  /* ① logo also gets shimmer */
+  background: var(--shimmer-grad);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 4s linear infinite;
   text-decoration: none;
   letter-spacing: 0.12em;
   display: flex;
@@ -137,10 +159,25 @@ nav {
 .mobile-menu a:last-child { border-bottom: none; }
 .mobile-menu a:hover { color: var(--gold-light); }
 
+
+/* ─────────────────────────────────────────
+   HERO — ⑤ RADIAL VIGNETTE BACKGROUND
+───────────────────────────────────────── */
 .hero {
   position: relative;
   min-height: calc(100vh - 64px);
-  background: var(--brown-deep);
+
+  /* ⑤ Radial vignette: warm rich centre fades to near-black edges */
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%,
+      rgba(212,168,67,0.07) 0%,
+      rgba(61,31,10,0.6)    45%,
+      transparent           100%),
+    radial-gradient(ellipse 100% 80% at 50% 50%,
+      var(--brown-rich)     0%,
+      var(--brown-deep)     40%,
+      var(--brown-deepest)  100%);
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -148,6 +185,28 @@ nav {
   overflow: hidden;
 }
 
+/* ② FLOATING GOLD DUST — injected by JS (.dust-particle) */
+.dust-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  pointer-events: none;
+  animation: dust-rise linear infinite;
+  opacity: 0;
+  z-index: 1;
+}
+
+@keyframes dust-rise {
+  0%   { transform: translateY(0)      scale(1);    opacity: 0; }
+  15%  { opacity: 0.65; }
+  70%  { opacity: 0.2; }
+  100% { transform: translateY(-110px) scale(0.25); opacity: 0; }
+}
+
+
+/* ─────────────────────────────────────────
+   DECORATIVE CHROME
+───────────────────────────────────────── */
 .meander-top, .meander-bottom {
   position: absolute;
   left: 0;
@@ -155,6 +214,7 @@ nav {
   height: 28px;
   overflow: hidden;
   opacity: 0.45;
+  z-index: 2;
 }
 
 .meander-top { top: 0; }
@@ -167,6 +227,7 @@ nav {
   width: 52px;
   opacity: 0.22;
   pointer-events: none;
+  z-index: 2;
 }
 
 .col-left  { left: 0; }
@@ -177,6 +238,7 @@ nav {
   width: 64px;
   height: 64px;
   opacity: 0.35;
+  z-index: 2;
 }
 
 .corner-tl { top: 28px; left: 52px; }
@@ -184,9 +246,13 @@ nav {
 .corner-bl { bottom: 28px; left: 52px; transform: scaleY(-1); }
 .corner-br { bottom: 28px; right: 52px; transform: scale(-1,-1); }
 
+
+/* ─────────────────────────────────────────
+   HERO CONTENT
+───────────────────────────────────────── */
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   text-align: center;
   padding: 4rem 2rem;
   max-width: 860px;
@@ -215,15 +281,30 @@ nav {
   text-transform: uppercase;
 }
 
+/* ① SHIMMER TEXT — hero title */
 h1.hero-title {
   font-family: 'Cinzel', serif;
   font-size: clamp(3.8rem, 10vw, 7.5rem);
   font-weight: 900;
   line-height: 0.95;
   letter-spacing: 0.04em;
-  color: var(--gold-bright);
-  text-shadow: 0 0 60px rgba(212,168,67,0.15), 0 2px 4px rgba(0,0,0,0.6);
+
+  /* ① animated shimmer */
+  background: var(--shimmer-grad);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 3.5s linear infinite;
+
+  /* keep legibility */
+  filter: drop-shadow(0 2px 8px rgba(212,168,67,0.18));
   margin-bottom: 0.4rem;
+}
+
+@keyframes shimmer-sweep {
+  0%   { background-position: 0%   center; }
+  100% { background-position: 200% center; }
 }
 
 .title-underline {
@@ -289,12 +370,40 @@ h1.hero-title {
   letter-spacing: 0.01em;
 }
 
+
+/* ─────────────────────────────────────────
+   BUTTONS — ③ GLOW BORDER + ⑥ FOIL TEXTURE
+───────────────────────────────────────── */
 .btn-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   max-width: 640px;
   margin: 0 auto;
+}
+
+/* ③ Animated glow border wrapper — wraps each .btn in HTML:
+      <div class="btn-glow-ring"><a class="btn">…</a></div>  */
+.btn-glow-ring {
+  position: relative;
+  border-radius: 4px;           /* small clip allowance */
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    var(--gold-dark),
+    var(--gold-shimmer),
+    var(--gold-bright),
+    var(--gold-dark)
+  );
+  background-size: 300% 300%;
+  animation: glow-rotate 3.5s ease infinite;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+
+@keyframes glow-rotate {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
 }
 
 .btn {
@@ -306,45 +415,67 @@ h1.hero-title {
   text-transform: uppercase;
   text-decoration: none;
   color: var(--brown-deepest);
-  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-bright) 50%, var(--gold-dark) 100%);
+
+  /* ⑥ Gold foil texture: gradient + micro-stripe overlay */
+  background:
+    repeating-linear-gradient(
+      72deg,
+      transparent          0px,
+      transparent          3px,
+      rgba(255,255,255,0.045) 3px,
+      rgba(255,255,255,0.045) 4px
+    ),
+    linear-gradient(
+      135deg,
+      var(--gold-light)  0%,
+      var(--gold-shimmer) 22%,
+      var(--gold-bright)  50%,
+      var(--gold-shimmer) 78%,
+      var(--gold-dark)    100%
+    );
+
   border: none;
   padding: 1rem 1.4rem;
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, filter 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5px;
   text-align: center;
   clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  width: 100%;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.25);
 }
 
+/* sheen sweep on hover */
 .btn::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.25s;
+  top: 0; left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255,255,255,0.28) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.45s ease;
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(212,168,67,0.35);
+  filter: brightness(1.08) drop-shadow(0 6px 18px rgba(212,168,67,0.5));
 }
 
-.btn:hover::before { opacity: 1; }
-.btn:active { transform: translateY(0); }
+.btn:hover::before { left: 130%; }
+.btn:active { transform: translateY(0); filter: brightness(0.97); }
 
-.btn-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.btn-label {
-  line-height: 1.2;
-}
+.btn-icon  { font-size: 1.1rem; line-height: 1; }
+.btn-label { line-height: 1.2; }
 
 .btn-sub {
   font-family: 'Cormorant Garamond', serif;
@@ -352,11 +483,67 @@ h1.hero-title {
   font-weight: 400;
   font-style: italic;
   letter-spacing: 0.05em;
-  color: rgba(26,14,6,0.65);
+  color: rgba(26,14,6,0.62);
   text-transform: none;
   line-height: 1;
 }
 
+
+/* ─────────────────────────────────────────
+   ④ WAX SEAL COMPONENT
+   Usage: <div class="wax-seal"><span>✦</span></div>
+   Optional modifier: .wax-seal--lg for 72px
+───────────────────────────────────────── */
+.wax-seal {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+
+  /* concentric glow rings */
+  box-shadow:
+    0 0 0 2px  var(--gold-bright),
+    0 0 0 5px  rgba(212,168,67,0.18),
+    0 0 0 9px  rgba(212,168,67,0.08),
+    0 0 22px 4px rgba(212,168,67,0.22);
+
+  /* radial depth */
+  background: radial-gradient(
+    circle at 36% 32%,
+    var(--gold-light)  0%,
+    var(--gold-bright) 38%,
+    var(--gold-dark)   72%,
+    var(--brown-mid)   100%
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brown-deepest);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  flex-shrink: 0;
+  animation: seal-pulse 4s ease-in-out infinite;
+}
+
+.wax-seal--lg {
+  width: 72px;
+  height: 72px;
+  font-size: 1.6rem;
+}
+
+/* subtle breathing glow */
+@keyframes seal-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--gold-bright), 0 0 0 5px rgba(212,168,67,0.18), 0 0 0 9px rgba(212,168,67,0.08), 0 0 22px 4px rgba(212,168,67,0.22); }
+  50%       { box-shadow: 0 0 0 2px var(--gold-shimmer), 0 0 0 6px rgba(212,168,67,0.28), 0 0 0 12px rgba(212,168,67,0.1), 0 0 32px 8px rgba(212,168,67,0.3); }
+}
+
+
+/* ─────────────────────────────────────────
+   SCROLL CUE
+───────────────────────────────────────── */
 .scroll-cue {
   position: absolute;
   bottom: 42px;
@@ -368,6 +555,7 @@ h1.hero-title {
   gap: 6px;
   opacity: 0.4;
   animation: bob 2.2s ease-in-out infinite;
+  z-index: 3;
 }
 
 .scroll-cue span {
@@ -392,9 +580,41 @@ h1.hero-title {
   50%       { transform: translateX(-50%) translateY(6px); }
 }
 
+
+/* ─────────────────────────────────────────
+   UTILITY: gold foil surface (apply to
+   any solid gold block — banners, badges)
+───────────────────────────────────────── */
+.gold-foil {
+  background:
+    repeating-linear-gradient(
+      72deg,
+      transparent             0px,
+      transparent             3px,
+      rgba(255,255,255,0.055) 3px,
+      rgba(255,255,255,0.055) 4px
+    ),
+    linear-gradient(
+      155deg,
+      var(--gold-deeper)   0%,
+      var(--gold-dark)     18%,
+      var(--gold-bright)   38%,
+      var(--gold-shimmer)  50%,
+      var(--gold-bright)   62%,
+      var(--gold-dark)     82%,
+      var(--gold-deeper)   100%
+    );
+  color: var(--brown-deepest);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.22);
+}
+
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
 @media (max-width: 680px) {
-  .nav-links { display: none; }
-  .hamburger { display: flex; }
+  .nav-links  { display: none; }
+  .hamburger  { display: flex; }
   .col-left, .col-right, .corner { display: none; }
   .hero-content { padding: 3rem 1.25rem; }
   .btn-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -408,7 +628,16 @@ h1.hero-title {
   h1.hero-title { font-size: 3.2rem; }
 }
 
+
+/* ─────────────────────────────────────────
+   REDUCED MOTION — kill all animations
+───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .scroll-cue { animation: none; }
+  .scroll-cue       { animation: none; }
+  h1.hero-title     { animation: none; }
+  .nav-logo         { animation: none; }
+  .btn-glow-ring    { animation: none; }
+  .wax-seal         { animation: none; }
+  .dust-particle    { display: none; }
   .btn, .btn::before, .nav-links a::after { transition: none; }
 }
